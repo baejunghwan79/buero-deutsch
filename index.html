@@ -1,0 +1,1915 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Büro Deutsch">
+<meta name="theme-color" content="#1a1a2e">
+<title>Büro Deutsch — 직장 독일어</title>
+<link rel="manifest" href="data:application/json,{%22name%22:%22B%C3%BCro%20Deutsch%22,%22short_name%22:%22B%C3%BCro%20DE%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22theme_color%22:%22%231a1a2e%22,%22background_color%22:%22%231a1a2e%22}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0f0f1a;
+  --bg2: #1a1a2e;
+  --bg3: #22223a;
+  --bg4: #2d2d4a;
+  --accent: #7c6fe0;
+  --accent2: #a594f9;
+  --accent3: #c4b5fd;
+  --gold: #e8c547;
+  --green: #4ade80;
+  --red: #f87171;
+  --text: #f0eff8;
+  --text2: #a8a6c0;
+  --text3: #6b698a;
+  --border: rgba(124,111,224,0.18);
+  --border2: rgba(124,111,224,0.35);
+  --card: rgba(26,26,46,0.95);
+  --radius: 16px;
+  --radius-sm: 10px;
+  --serif: 'DM Serif Display', Georgia, serif;
+  --sans: 'DM Sans', system-ui, sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--sans); font-size: 15px; line-height: 1.6; overflow: hidden; }
+#app { height: 100dvh; display: flex; flex-direction: column; max-width: 430px; margin: 0 auto; position: relative; overflow: hidden; }
+
+/* ── SCREENS ── */
+.screen { position: absolute; inset: 0; display: none; flex-direction: column; overflow: hidden; }
+.screen.active { display: flex; }
+
+/* ── NAV BAR ── */
+.nav {
+  display: flex; align-items: center; gap: 10px;
+  padding: 52px 20px 14px;
+  background: linear-gradient(to bottom, var(--bg2), transparent);
+  flex-shrink: 0;
+}
+.nav-title { font-family: var(--sans); font-size: 16px; font-weight: 600; font-style: normal; flex: 1; color: var(--text); }
+.nav-sub { font-size: 11px; color: var(--text3); display: block; font-family: var(--sans); font-style: normal; font-weight: 400; }
+.btn-back { width: 36px; height: 36px; border-radius: 50%; background: var(--bg3); border: 0.5px solid var(--border); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text2); font-size: 18px; flex-shrink: 0; }
+.btn-icon { width: 36px; height: 36px; border-radius: 50%; background: var(--bg3); border: 0.5px solid var(--border); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text2); font-size: 16px; flex-shrink: 0; }
+.btn-icon:hover, .btn-back:hover { background: var(--bg4); }
+
+/* ── SCROLL AREA ── */
+.scroll { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 0 20px 100px; scroll-behavior: smooth; }
+.scroll::-webkit-scrollbar { display: none; }
+
+/* ── HOME ── */
+.home-hero { padding: 8px 20px 20px; }
+.home-hero h1 { font-family: var(--serif); font-size: 32px; font-style: italic; color: var(--text); line-height: 1.15; }
+.home-hero h1 em { color: var(--accent2); font-style: normal; }
+.home-hero p { font-size: 13px; color: var(--text2); margin-top: 6px; }
+
+.level-row { display: flex; align-items: center; gap: 8px; padding: 0 20px 16px; }
+.level-pill { padding: 6px 14px; border-radius: 30px; font-size: 12px; font-weight: 600; letter-spacing: 0.04em; cursor: pointer; border: 1.5px solid transparent; transition: all 0.15s; }
+.level-pill.a1 { background: rgba(74,222,128,0.1); color: var(--green); border-color: rgba(74,222,128,0.25); }
+.level-pill.a2 { background: rgba(124,111,224,0.15); color: var(--accent2); border-color: var(--border2); }
+.level-pill.b1 { background: rgba(232,197,71,0.1); color: var(--gold); border-color: rgba(232,197,71,0.25); }
+.level-pill.active { transform: scale(1.05); box-shadow: 0 0 0 2px currentColor; }
+
+.section-label { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text3); padding: 0 0 10px; }
+
+.scenario-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 24px; }
+.scenario-card {
+  background: var(--bg2);
+  border: 0.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 14px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, transform 0.12s;
+  position: relative; overflow: hidden;
+}
+.scenario-card::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(124,111,224,0.08), transparent); opacity: 0; transition: opacity 0.2s; }
+.scenario-card:hover { background: var(--bg3); border-color: var(--border2); transform: translateY(-1px); }
+.scenario-card:hover::before { opacity: 1; }
+.sc-icon { font-size: 24px; margin-bottom: 10px; display: block; }
+.sc-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+.sc-sub { font-size: 11px; color: var(--text3); line-height: 1.35; }
+.sc-prog { height: 2px; background: var(--bg4); border-radius: 2px; margin-top: 10px; }
+.sc-prog-fill { height: 100%; border-radius: 2px; background: linear-gradient(to right, var(--accent), var(--accent2)); transition: width 0.4s; }
+.sc-badge { position: absolute; top: 10px; right: 10px; font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 10px; background: rgba(124,111,224,0.2); color: var(--accent2); }
+
+.stats-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 24px; }
+.stat-card { background: var(--bg2); border: 0.5px solid var(--border); border-radius: var(--radius-sm); padding: 12px; text-align: center; }
+.stat-num { font-family: var(--serif); font-size: 22px; color: var(--accent2); }
+.stat-label { font-size: 10px; color: var(--text3); margin-top: 2px; }
+
+.quick-btns { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
+.quick-btn { padding: 7px 14px; border-radius: 20px; border: 0.5px solid var(--border); background: none; color: var(--text2); font-size: 12px; font-weight: 500; cursor: pointer; font-family: var(--sans); transition: all 0.15s; }
+.quick-btn:hover, .quick-btn.on { background: rgba(124,111,224,0.15); color: var(--accent2); border-color: var(--border2); }
+
+/* ── LESSON ── */
+.phrase-card {
+  background: var(--bg2);
+  border: 0.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+.phrase-card:hover { background: var(--bg3); border-color: var(--border2); }
+.phrase-card.expanded { border-color: var(--border2); }
+.ph-de { font-size: 15px; font-weight: 500; color: var(--text); }
+.ph-ko { font-size: 12px; color: var(--text2); margin-top: 3px; }
+.ph-row { display: flex; align-items: flex-start; gap: 10px; }
+.ph-play { flex-shrink: 0; width: 32px; height: 32px; border-radius: 50%; background: rgba(124,111,224,0.12); border: 0.5px solid var(--border2); display: flex; align-items: center; justify-content: center; color: var(--accent2); font-size: 14px; margin-top: 2px; }
+.ph-details { display: none; margin-top: 12px; padding-top: 12px; border-top: 0.5px solid var(--border); }
+.phrase-card.expanded .ph-details { display: block; }
+.ph-example { font-size: 12px; color: var(--text2); font-style: italic; margin-bottom: 8px; }
+.grammar-box { background: rgba(124,111,224,0.08); border: 0.5px solid var(--border2); border-radius: var(--radius-sm); padding: 10px 12px; }
+.grammar-tag { font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--accent); margin-bottom: 4px; }
+.grammar-text { font-size: 12px; color: var(--text2); line-height: 1.5; }
+.grammar-text strong { color: var(--accent2); font-weight: 500; }
+
+.lesson-actions { display: flex; gap: 10px; margin: 16px 0; }
+.btn-main { flex: 1; padding: 13px; border-radius: var(--radius-sm); border: none; font-family: var(--sans); font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.15s; }
+.btn-main.primary { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff; }
+.btn-main.secondary { background: var(--bg3); color: var(--text2); border: 0.5px solid var(--border); }
+.btn-main:hover { opacity: 0.88; transform: translateY(-1px); }
+.btn-main:active { transform: scale(0.97); }
+
+/* ── CHAT ── */
+.chat-messages { flex: 1; overflow-y: auto; padding: 16px 16px 0; display: flex; flex-direction: column; gap: 12px; }
+.chat-messages::-webkit-scrollbar { display: none; }
+
+.msg { max-width: 82%; animation: fadeUp 0.2s ease; }
+.msg.ai { align-self: flex-start; }
+.msg.user { align-self: flex-end; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+.msg-bubble { padding: 10px 14px; border-radius: 18px; font-size: 13px; line-height: 1.55; }
+.msg.ai .msg-bubble { background: var(--bg3); color: var(--text); border: 0.5px solid var(--border); border-bottom-left-radius: 4px; }
+.msg.user .msg-bubble { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff; border-bottom-right-radius: 4px; }
+.msg-meta { font-size: 10px; color: var(--text3); margin-top: 4px; padding: 0 4px; }
+
+.typing-dots { align-self: flex-start; background: var(--bg3); border: 0.5px solid var(--border); border-radius: 18px; border-bottom-left-radius: 4px; padding: 12px 16px; display: none; gap: 4px; }
+.typing-dots.show { display: flex; }
+.dot { width: 6px; height: 6px; border-radius: 50%; background: var(--text3); animation: typingBounce 1.2s infinite; }
+.dot:nth-child(2) { animation-delay: 0.2s; }
+.dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes typingBounce { 0%,60%,100% { transform: translateY(0); } 30% { transform: translateY(-6px); } }
+
+.chat-bottom { flex-shrink: 0; padding: 12px 16px 32px; background: linear-gradient(to top, var(--bg2) 80%, transparent); }
+.voice-status { font-size: 11px; color: var(--text3); text-align: center; height: 16px; margin-bottom: 8px; transition: color 0.2s; }
+.voice-status.on { color: var(--red); }
+.chat-row { display: flex; align-items: center; gap: 8px; }
+.chat-input {
+  flex: 1; background: var(--bg3); border: 0.5px solid var(--border); border-radius: 22px;
+  padding: 10px 16px; font-size: 13px; color: var(--text); font-family: var(--sans); outline: none;
+  transition: border-color 0.15s;
+}
+.chat-input:focus { border-color: var(--border2); }
+.chat-input::placeholder { color: var(--text3); }
+.btn-mic { width: 42px; height: 42px; border-radius: 50%; background: var(--bg3); border: 0.5px solid var(--border); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text2); font-size: 18px; flex-shrink: 0; transition: all 0.15s; }
+.btn-mic.on { background: rgba(248,113,113,0.15); border-color: rgba(248,113,113,0.4); color: var(--red); animation: micPulse 1s infinite; }
+@keyframes micPulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.06)} }
+.btn-send { width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--accent2)); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #fff; font-size: 18px; flex-shrink: 0; transition: all 0.15s; }
+.btn-send:hover { opacity: 0.85; }
+.btn-send:disabled { opacity: 0.3; cursor: default; }
+.chat-mode-row { display: flex; gap: 6px; margin-bottom: 10px; }
+.mode-chip { flex: 1; padding: 7px 4px; border-radius: var(--radius-sm); background: var(--bg3); border: 0.5px solid var(--border); font-size: 11px; font-weight: 600; color: var(--text3); cursor: pointer; text-align: center; transition: all 0.15s; font-family: var(--sans); }
+.mode-chip.on { background: rgba(124,111,224,0.15); color: var(--accent2); border-color: var(--border2); }
+
+/* ── GRAMMAR ANALYSIS CARD ── */
+.analysis-card {
+  background: var(--bg2);
+  border: 0.5px solid var(--border2);
+  border-radius: var(--radius);
+  overflow: hidden;
+  max-width: 92%;
+  align-self: flex-start;
+  animation: fadeUp 0.2s ease;
+}
+.analysis-header {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 14px 8px;
+  background: rgba(124,111,224,0.1);
+  border-bottom: 0.5px solid var(--border);
+}
+.analysis-header .orig { font-size: 13px; font-weight: 600; color: var(--accent2); flex: 1; line-height: 1.4; }
+.analysis-verdict { font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 10px; flex-shrink: 0; }
+.verdict-ok { background: rgba(74,222,128,0.15); color: var(--green); }
+.verdict-fix { background: rgba(248,113,113,0.15); color: var(--red); }
+.verdict-good { background: rgba(232,197,71,0.15); color: var(--gold); }
+
+.analysis-section { padding: 10px 14px; border-bottom: 0.5px solid var(--border); }
+.analysis-section:last-child { border-bottom: none; }
+.analysis-section-title {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--accent); margin-bottom: 7px;
+  display: flex; align-items: center; gap: 5px;
+}
+.analysis-section-title span { font-size: 13px; }
+
+/* 문장 구조 토큰 */
+.token-row { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 4px; }
+.token { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.token-word { font-size: 13px; font-weight: 600; color: var(--text); padding: 4px 8px; border-radius: 6px; border: 1.5px solid transparent; white-space: nowrap; }
+.token-label { font-size: 9px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; }
+.tok-subject .token-word { background: rgba(74,222,128,0.12); border-color: rgba(74,222,128,0.35); color: var(--green); }
+.tok-subject .token-label { color: var(--green); }
+.tok-verb .token-word { background: rgba(124,111,224,0.15); border-color: var(--border2); color: var(--accent2); }
+.tok-verb .token-label { color: var(--accent2); }
+.tok-modal .token-word { background: rgba(165,148,249,0.15); border-color: rgba(165,148,249,0.4); color: var(--accent3); }
+.tok-modal .token-label { color: var(--accent3); }
+.tok-object .token-word { background: rgba(232,197,71,0.1); border-color: rgba(232,197,71,0.3); color: var(--gold); }
+.tok-object .token-label { color: var(--gold); }
+.tok-adverb .token-word { background: rgba(251,146,60,0.1); border-color: rgba(251,146,60,0.3); color: #fb923c; }
+.tok-adverb .token-label { color: #fb923c; }
+.tok-prep .token-word { background: rgba(56,189,248,0.1); border-color: rgba(56,189,248,0.3); color: #38bdf8; }
+.tok-prep .token-label { color: #38bdf8; }
+.tok-other .token-word { background: var(--bg3); border-color: var(--border); color: var(--text2); }
+.tok-other .token-label { color: var(--text3); }
+
+.analysis-point { font-size: 12px; color: var(--text2); line-height: 1.55; margin-bottom: 5px; }
+.analysis-point:last-child { margin-bottom: 0; }
+.analysis-point strong { color: var(--accent2); font-weight: 600; }
+.analysis-point .tag { display: inline-block; font-size: 10px; font-weight: 600; padding: 1px 6px; border-radius: 6px; margin-right: 4px; background: rgba(124,111,224,0.15); color: var(--accent2); }
+.alt-chip { display: inline-block; background: var(--bg3); border: 0.5px solid var(--border2); border-radius: 8px; padding: 5px 10px; font-size: 12px; color: var(--text); margin: 3px 3px 0 0; cursor: pointer; transition: background 0.12s; }
+.alt-chip:hover { background: var(--bg4); }
+.alt-chip em { font-style: normal; font-size: 10px; color: var(--text3); display: block; margin-top: 1px; }
+.correction-box { background: rgba(248,113,113,0.08); border: 0.5px solid rgba(248,113,113,0.3); border-radius: var(--radius-sm); padding: 8px 10px; font-size: 12px; color: var(--text2); line-height: 1.5; }
+.correction-box strong { color: var(--red); }
+.correction-box .fixed { color: var(--green); font-weight: 600; }
+
+/* ── PRINT SCREEN ── */
+.print-options { margin-bottom: 16px; }
+.print-section { background: var(--bg2); border: 0.5px solid var(--border); border-radius: var(--radius); margin-bottom: 12px; overflow: hidden; }
+.print-section-header { display: flex; align-items: center; gap: 10px; padding: 14px 16px; cursor: pointer; }
+.print-section-header h3 { font-size: 14px; font-weight: 600; flex: 1; color: var(--text); }
+.print-section-body { padding: 0 16px 14px; display: none; }
+.print-section.open .print-section-body { display: block; }
+.print-word-row { display: flex; justify-content: space-between; align-items: baseline; padding: 6px 0; border-bottom: 0.5px solid var(--border); font-size: 12px; gap: 8px; }
+.print-word-row:last-child { border-bottom: none; }
+.pw-de { color: var(--accent2); font-weight: 500; flex: 1; }
+.pw-ko { color: var(--text2); }
+.pw-grammar { font-size: 10px; color: var(--text3); margin-top: 2px; }
+.btn-print { width: 100%; padding: 13px; border-radius: var(--radius-sm); background: linear-gradient(135deg, var(--accent), var(--accent2)); border: none; color: #fff; font-size: 14px; font-weight: 600; cursor: pointer; font-family: var(--sans); margin-bottom: 10px; transition: opacity 0.15s; }
+.btn-print:hover { opacity: 0.85; }
+
+/* ── BOTTOM TAB ── */
+.tab-bar { display: none; background: var(--bg2); border-top: 0.5px solid var(--border); padding: 8px 0 28px; flex-shrink: 0; }
+.tab { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 6px 0; cursor: pointer; border: none; background: none; color: var(--text3); font-family: var(--sans); font-size: 10px; font-weight: 500; transition: color 0.15s; }
+.tab.on { color: var(--accent2); }
+.tab-icon { font-size: 20px; }
+
+/* ── GRAMMAR MODAL ── */
+.modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 100; display: none; align-items: flex-end; justify-content: center; backdrop-filter: blur(4px); }
+.modal-bg.show { display: flex; }
+.modal { background: var(--bg2); border: 0.5px solid var(--border2); border-radius: var(--radius) var(--radius) 0 0; padding: 20px 20px 40px; width: 100%; max-width: 430px; max-height: 80vh; overflow-y: auto; animation: slideUp 0.25s ease; }
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.modal h2 { font-family: var(--serif); font-size: 22px; font-style: italic; color: var(--accent2); margin-bottom: 16px; }
+.grammar-section { margin-bottom: 18px; }
+.grammar-section h3 { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
+.grammar-section p { font-size: 13px; color: var(--text2); line-height: 1.6; }
+.grammar-section p strong { color: var(--text); font-weight: 600; }
+.grammar-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 8px; }
+.grammar-table th { background: var(--bg3); color: var(--accent2); font-weight: 600; padding: 7px 10px; text-align: left; border: 0.5px solid var(--border); }
+.grammar-table td { padding: 7px 10px; border: 0.5px solid var(--border); color: var(--text2); }
+.grammar-table tr:nth-child(even) td { background: var(--bg3); }
+
+/* ── PRINT CSS ── */
+@media print {
+  body { background: #fff; color: #000; font-family: Georgia, serif; }
+  .tab-bar, .nav, .btn-print, .modal-bg, #screen-home, #screen-lesson, #screen-chat { display: none !important; }
+  #screen-print { position: static !important; opacity: 1 !important; pointer-events: all !important; transform: none !important; overflow: visible !important; }
+  #screen-print .scroll { overflow: visible; padding: 0; }
+  .print-section { background: #fff; border: 1px solid #ccc; page-break-inside: avoid; margin-bottom: 16px; }
+  .print-section-header { border-bottom: 1px solid #ccc; }
+  .print-section-body { display: block !important; }
+  .print-section-header h3 { color: #333; }
+  .pw-de { color: #4a3fc0; }
+  .pw-ko { color: #555; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+
+/* ── AI GENERATE BUTTON ── */
+.btn-ai-generate {
+  width: 100%;
+  padding: 12px;
+  border-radius: var(--radius-sm);
+  border: 1.5px dashed var(--border2);
+  background: rgba(124,111,224,0.06);
+  color: var(--accent2);
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  transition: all 0.18s;
+}
+.btn-ai-generate:hover { background: rgba(124,111,224,0.13); border-style: solid; }
+.btn-ai-generate:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-ai-generate.loading { animation: generatePulse 1.2s infinite; }
+@keyframes generatePulse { 0%,100%{opacity:1} 50%{opacity:0.55} }
+
+/* AI 생성 표현 구분선 */
+.ai-phrases-divider {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px 8px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+/* AI 생성 표현 카드 — 기존 phrase-card와 동일 + 뱃지 */
+.ai-phrase-card {
+  background: var(--bg2);
+  border: 0.5px solid rgba(124,111,224,0.25);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  margin: 0 20px 10px;
+  cursor: pointer;
+  transition: background 0.15s;
+  position: relative;
+}
+.ai-phrase-card:hover { background: var(--bg3); }
+.ai-phrase-card.expanded .ph-details { display: block; }
+.ai-badge {
+  position: absolute; top: 10px; right: 10px;
+  font-size: 9px; font-weight: 700; letter-spacing: 0.06em;
+  padding: 2px 7px; border-radius: 8px;
+  background: rgba(124,111,224,0.18); color: var(--accent2);
+}
+
+
+/* ── API KEY SCREEN ── */
+#apikey-overlay {
+  position: fixed; inset: 0;
+  background: var(--bg);
+  z-index: 200;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+#apikey-overlay.show { display: flex; }
+#apikey-overlay em { font-style: normal; }
+
+
+/* ── HOME TOPBAR ── */
+.home-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 52px 20px 16px;
+  flex-shrink: 0;
+}
+.home-wordmark { display: flex; flex-direction: column; gap: 3px; }
+.home-wordmark-title {
+  font-family: var(--serif);
+  font-size: 28px;
+  font-style: italic;
+  color: var(--text);
+  line-height: 1.1;
+}
+.home-wordmark-title em { color: var(--accent2); font-style: normal; }
+.home-wordmark-sub { font-size: 12px; color: var(--text2); }
+
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- ═══ API KEY SETUP ═══ -->
+<div id="apikey-overlay">
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 28px;">
+    <div style="font-size:48px;margin-bottom:20px;">🔑</div>
+    <h1 style="font-family:var(--serif);font-size:28px;font-style:italic;color:var(--text);text-align:center;margin-bottom:10px;">
+      Büro <em style="color:var(--accent2)">Deutsch</em>
+    </h1>
+    <p style="font-size:13px;color:var(--text2);text-align:center;line-height:1.6;margin-bottom:28px;">
+      AI 기능을 사용하려면<br>Anthropic API 키가 필요합니다.<br>키는 이 기기에만 저장되며 외부로 전송되지 않습니다.
+    </p>
+
+    <div style="width:100%;margin-bottom:12px;">
+      <div style="font-size:11px;font-weight:600;color:var(--text3);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:8px;">API 키 입력</div>
+      <div style="position:relative;">
+        <input id="apikey-input"
+          type="password"
+          placeholder="sk-ant-..."
+          style="width:100%;background:var(--bg3);border:1.5px solid var(--border2);border-radius:var(--radius-sm);
+                 padding:12px 44px 12px 14px;font-size:13px;color:var(--text);font-family:var(--sans);
+                 outline:none;transition:border-color 0.15s;"
+          oninput="validateKey()"
+          onfocus="this.style.borderColor='var(--accent2)'"
+          onblur="this.style.borderColor='var(--border2)'"
+        >
+        <button onclick="toggleKeyVisibility()"
+          style="position:absolute;right:10px;top:50%;transform:translateY(-50%);
+                 background:none;border:none;cursor:pointer;font-size:18px;color:var(--text3);"
+          id="eye-btn">👁</button>
+      </div>
+      <div id="key-error" style="font-size:11px;color:var(--red);margin-top:6px;display:none;">
+        올바른 API 키 형식이 아닙니다 (sk-ant-로 시작해야 합니다)
+      </div>
+    </div>
+
+    <button id="apikey-confirm" onclick="saveApiKey()"
+      style="width:100%;padding:14px;border-radius:var(--radius-sm);
+             background:linear-gradient(135deg,var(--accent),var(--accent2));
+             border:none;color:#fff;font-family:var(--sans);font-size:14px;
+             font-weight:700;cursor:pointer;margin-bottom:16px;opacity:0.4;transition:opacity 0.2s;"
+      disabled>
+      시작하기 →
+    </button>
+
+    <div style="background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;width:100%;">
+      <div style="font-size:11px;font-weight:700;color:var(--accent);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:8px;">🔐 보안 안내</div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.6;">
+        • 키는 이 기기의 브라우저에만 저장됩니다<br>
+        • 어떤 서버에도 전송되지 않습니다<br>
+        • Claude API에만 직접 사용됩니다<br>
+        • 앱 설정에서 언제든 변경·삭제 가능
+      </div>
+    </div>
+
+    <a href="https://console.anthropic.com/settings/keys" target="_blank"
+      style="margin-top:16px;font-size:12px;color:var(--accent2);text-decoration:none;">
+      API 키 발급받기 → console.anthropic.com ↗
+    </a>
+  </div>
+</div>
+
+
+<!-- ═══ HOME ═══ -->
+<div class="screen" id="screen-home">
+  <div class="home-topbar">
+    <div class="home-wordmark">
+      <span class="home-wordmark-title">Büro <em>Deutsch</em></span>
+      <span class="home-wordmark-sub">독일 직장인을 위한 실무 독일어</span>
+    </div>
+    <button class="btn-icon" onclick="showSettings()" title="설정">⚙️</button>
+  </div>
+
+  <div class="level-row">
+    <span style="font-size:11px;color:var(--text3);margin-right:4px">수준:</span>
+    <button class="level-pill a1" onclick="setLevel('A1',this)">A1</button>
+    <button class="level-pill a2 active" onclick="setLevel('A2',this)">A2</button>
+    <button class="level-pill b1" onclick="setLevel('B1',this)">B1</button>
+  </div>
+
+  <div class="scroll">
+    <div class="stats-row" id="stats-row"></div>
+
+    <div class="section-label">카테고리</div>
+    <div class="quick-btns">
+      <button class="quick-btn on" onclick="filterCat('all',this)">전체</button>
+      <button class="quick-btn" onclick="filterCat('smalltalk',this)">스몰토크</button>
+      <button class="quick-btn" onclick="filterCat('meeting',this)">회의</button>
+      <button class="quick-btn" onclick="filterCat('email',this)">이메일</button>
+      <button class="quick-btn" onclick="filterCat('lunch',this)">점심</button>
+    </div>
+
+    <div class="section-label">시나리오</div>
+    <div class="scenario-grid" id="scenario-grid"></div>
+  </div>
+</div>
+
+<!-- ═══ LESSON ═══ -->
+<div class="screen" id="screen-lesson">
+  <div class="nav">
+    <button class="btn-back" onclick="goHome()">←</button>
+    <span class="nav-title" id="lesson-nav-title">레슨
+      <span class="nav-sub" id="lesson-nav-sub"></span>
+    </span>
+    <button class="btn-icon" onclick="openGrammarModal()" title="문법 설명">📖</button>
+  </div>
+  <div style="flex:1;overflow-y:auto;overflow-x:hidden;">
+    <div class="scroll" id="phrase-list" style="padding-bottom:0;"></div>
+    <div id="ai-phrases-section" style="display:none;padding:0 0 16px;">
+      <div class="ai-phrases-divider">
+        <span>✨ AI 생성 표현</span>
+        <button onclick="clearAIPhrases()" style="background:none;border:none;color:var(--text3);font-size:11px;cursor:pointer;font-family:var(--sans);">전체 삭제</button>
+      </div>
+      <div id="ai-phrases-list"></div>
+    </div>
+  </div>
+  <div style="padding:0 20px 16px;flex-shrink:0;background:var(--bg);">
+    <button class="btn-ai-generate" id="btn-generate" onclick="generateMorePhrases()">
+      <span id="generate-icon">✨</span>
+      <span id="generate-label">AI로 표현 더 생성하기</span>
+    </button>
+    <div class="lesson-actions">
+      <button class="btn-main secondary" onclick="playAll()">🔊 전체 듣기</button>
+      <button class="btn-main primary" onclick="startRoleplay()">💬 롤플레이 시작</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ CHAT ═══ -->
+<div class="screen" id="screen-chat">
+  <div class="nav">
+    <button class="btn-back" onclick="goBack()">←</button>
+    <span class="nav-title" id="chat-nav-title">AI 대화
+      <span class="nav-sub" id="chat-nav-sub">독일어로 자유롭게 말해보세요</span>
+    </span>
+  </div>
+  <div class="chat-messages" id="chat-messages">
+    <div class="typing-dots" id="typing-dots">
+      <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    </div>
+  </div>
+  <div class="chat-bottom">
+    <div class="chat-mode-row">
+      <button class="mode-chip on" id="mode-text" onclick="setMode('text')">⌨️ 대화</button>
+      <button class="mode-chip" id="mode-voice" onclick="setMode('voice')">🎙 음성</button>
+      <button class="mode-chip" id="mode-analyze" onclick="setMode('analyze')">🔬 문법분석</button>
+      <button class="mode-chip" id="mode-hint" onclick="toggleHints()">💡 힌트</button>
+    </div>
+    <div class="voice-status" id="voice-status"></div>
+    <div class="chat-row">
+      <input class="chat-input" id="chat-input" placeholder="독일어로 입력하세요..." onkeydown="if(event.key==='Enter')sendMsg()">
+      <button class="btn-mic" id="btn-mic" onclick="toggleMic()">🎤</button>
+      <button class="btn-send" id="btn-send" onclick="sendMsg()">➤</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ PRINT ═══ -->
+<div class="screen" id="screen-print">
+  <div class="nav">
+    <span class="nav-title" style="font-size:20px;">단어·표현 정리
+      <span class="nav-sub">탭하여 펼치기 · 인쇄 버튼으로 PDF 저장</span>
+    </span>
+  </div>
+  <div class="scroll">
+    <button class="btn-print" onclick="window.print()">🖨 PDF로 저장 / 인쇄</button>
+    <div id="print-content"></div>
+  </div>
+</div>
+
+<!-- ═══ TAB BAR ═══ -->
+<div class="tab-bar">
+  <button class="tab on" id="tab-home" onclick="switchTab('home')">
+    <span class="tab-icon">🏠</span>홈
+  </button>
+  <button class="tab" id="tab-chat" onclick="switchTab('chat-free')">
+    <span class="tab-icon">💬</span>자유대화
+  </button>
+  <button class="tab" id="tab-print" onclick="switchTab('print')">
+    <span class="tab-icon">📄</span>단어장
+  </button>
+</div>
+
+
+<!-- ═══ SETTINGS MODAL ═══ -->
+<div class="modal-bg" id="settings-modal" onclick="if(event.target===this)closeSettings()">
+  <div class="modal">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <h2 style="font-family:var(--serif);font-size:22px;font-style:italic;color:var(--accent2);">설정</h2>
+      <button onclick="closeSettings()" style="background:none;border:none;color:var(--text2);font-size:22px;cursor:pointer">✕</button>
+    </div>
+
+    <div class="grammar-section">
+      <h3>🔑 API 키</h3>
+      <div style="position:relative;margin-top:8px;">
+        <input id="settings-key-input" type="password"
+          style="width:100%;background:var(--bg3);border:1.5px solid var(--border2);border-radius:var(--radius-sm);
+                 padding:11px 44px 11px 14px;font-size:13px;color:var(--text);font-family:var(--sans);outline:none;"
+          placeholder="sk-ant-..."
+        >
+        <button onclick="toggleSettingsKeyVisibility()"
+          style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;color:var(--text3);"
+          id="settings-eye-btn">👁</button>
+      </div>
+      <button onclick="updateApiKey()"
+        style="width:100%;margin-top:10px;padding:11px;border-radius:var(--radius-sm);
+               background:linear-gradient(135deg,var(--accent),var(--accent2));
+               border:none;color:#fff;font-family:var(--sans);font-size:13px;font-weight:600;cursor:pointer;">
+        키 업데이트
+      </button>
+      <button onclick="deleteApiKey()"
+        style="width:100%;margin-top:8px;padding:10px;border-radius:var(--radius-sm);
+               background:rgba(248,113,113,0.1);border:0.5px solid rgba(248,113,113,0.3);
+               color:var(--red);font-family:var(--sans);font-size:13px;font-weight:600;cursor:pointer;">
+        키 삭제 (로그아웃)
+      </button>
+    </div>
+
+    <div class="grammar-section">
+      <h3>📊 학습 데이터 초기화</h3>
+      <p style="font-size:12px;color:var(--text2);margin:8px 0;">진행률, 연속 학습일, AI 생성 표현을 모두 초기화합니다.</p>
+      <button onclick="resetAllData()"
+        style="width:100%;padding:10px;border-radius:var(--radius-sm);
+               background:rgba(248,113,113,0.1);border:0.5px solid rgba(248,113,113,0.3);
+               color:var(--red);font-family:var(--sans);font-size:13px;font-weight:600;cursor:pointer;">
+        전체 초기화
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ GRAMMAR MODAL ═══ -->
+<div class="modal-bg" id="grammar-modal" onclick="if(event.target===this)closeGrammar()">
+  <div class="modal" id="grammar-content"></div>
+</div>
+
+</div><!-- #app -->
+
+<script>
+// ══════════════════════════════════════════
+// DATA
+// ══════════════════════════════════════════
+const SCENARIOS = [
+  {
+    id:'s1', cat:'smalltalk', icon:'☀️', title:'출근 인사', sub:'아침 인사·근황 묻기',
+    grammar: {
+      title: '격식체 vs 비격식체',
+      sections: [
+        { h: '독일어의 호칭', body: '<strong>Sie (지): 격식체</strong> — 상사, 처음 보는 동료에게 사용. 동사는 3인칭 복수형과 동일.<br><strong>du (두): 비격식체</strong> — 친한 동료, 친구에게 사용. "Duzen"이라고 불림.' },
+        { h: '현재 시제 기본형', table: [['주어','sein (이다)','haben (갖다)'],['ich','bin','habe'],['du','bist','hast'],['Sie','sind','haben']] },
+        { h: 'W-질문어', body: '<strong>Wie</strong> — 어떻게? &nbsp; <strong>Was</strong> — 무엇? &nbsp; <strong>Wo</strong> — 어디? &nbsp; <strong>Wann</strong> — 언제? &nbsp; <strong>Warum</strong> — 왜?' },
+      ]
+    },
+    phrases: {
+      A1: [
+        {de:'Guten Morgen!', ko:'좋은 아침이에요!', ex:'모든 상황에서 사용', gram:'guten = gut의 4격(Akkusativ) 형용사 변화'},
+        {de:'Wie geht es Ihnen?', ko:'어떻게 지내세요? (격식)', ex:'상사·처음 보는 동료', gram:'es geht = "잘 지내다"의 관용 표현. Ihnen = Sie의 3격'},
+        {de:'Gut, danke. Und Ihnen?', ko:'잘 지내요, 감사해요. 당신은요?', ex:'표준 답변', gram:'Und Ihnen? = 되묻기. 간단하지만 예의 바른 표현'},
+        {de:'Tschüss! / Auf Wiedersehen!', ko:'잘 가! / 안녕히 계세요!', ex:'Tschüss는 친근한 표현', gram:'Auf Wiedersehen = 다시 볼 때까지'},
+      ],
+      A2: [
+        {de:'Guten Morgen! Wie geht es Ihnen?', ko:'좋은 아침이에요! 어떻게 지내세요?', ex:'상사·격식체', gram:'guten = gut의 4격 변화. Ihnen = Sie의 3격 형태'},
+        {de:'Morgen! Alles gut bei dir?', ko:'안녕! 다 잘 되고 있어?', ex:'친한 동료에게', gram:'Morgen = 구어체 줄임말. bei dir = "너에게"(3격)'},
+        {de:'Ich bin ein bisschen müde, aber es geht.', ko:'좀 피곤하지만 괜찮아요.', ex:'솔직하게 답할 때', gram:'ein bisschen = 약간. aber = 하지만 (접속사, 어순 변화 없음)'},
+        {de:'Das Wetter ist heute schön, oder?', ko:'오늘 날씨 좋죠?', ex:'스몰토크 시작', gram:'oder? = 영어 "right?"와 같은 확인 부가의문문'},
+        {de:'Haben Sie das Wochenende genossen?', ko:'주말 잘 보내셨어요?', ex:'월요일 아침에', gram:'haben + 과거분사 = 현재완료(Perfekt). genossen = genießen의 과거분사'},
+      ],
+      B1: [
+        {de:'Wie läuft es so bei Ihnen?', ko:'요즘 어떻게 지내세요?', ex:'약간 캐주얼한 격식체', gram:'laufen = 돌아가다/진행되다. so = 뉘앙스를 부드럽게 하는 부사'},
+        {de:'Es war ein langes Wochenende, ehrlich gesagt.', ko:'솔직히 말하면 긴 주말이었어요.', ex:'편한 상황에서', gram:'ehrlich gesagt = 문장 부사(Satzadverb), 쉼표로 분리'},
+        {de:'Haben Sie das Wochenende genossen?', ko:'주말 잘 보내셨어요?', ex:'월요일 아침에', gram:'haben + 과거분사 = 현재완료(Perfekt). genossen = genießen의 과거분사'},
+        {de:'Schön, Sie wieder zu sehen!', ko:'다시 뵙게 되어 반갑습니다!', ex:'며칠 후 재회', gram:'zu + 부정사 = 영어 to부정사와 유사. wieder = 다시'},
+      ]
+    }
+  },
+  {
+    id:'s2', cat:'meeting', icon:'📊', title:'회의 참여', sub:'의견·동의·질문하기',
+    grammar: {
+      title: '의견 표현 & 정중한 요청',
+      sections: [
+        { h: 'Konjunktiv II — 정중한 표현', body: '<strong>Könnten Sie...?</strong> (해주실 수 있을까요?) = können의 접속법 2식.<br>Können보다 훨씬 공손한 표현. 직장에서 요청할 때 반드시 사용.' },
+        { h: '의견 표현 구조', body: '<strong>Meiner Meinung nach</strong> + 주어 + 동사 — "내 생각에는 ~"<br><strong>Ich finde, dass</strong> + 부문장 — "나는 ~라고 생각해요"<br>dass 이후에는 동사가 문장 맨 끝으로 이동!' },
+        { h: '부문장 어순', body: 'Ich finde, dass das Projekt <strong>gut läuft</strong>.<br>→ dass절에서 동사(läuft)가 맨 뒤로 이동.<br>이것은 독일어 문법의 핵심 규칙입니다!' },
+      ]
+    },
+    phrases: {
+      A1: [
+        {de:'Ich habe eine Frage.', ko:'질문이 있어요.', ex:'회의 중 발언할 때', gram:'eine = 여성/중성 명사 앞 부정관사(1격)'},
+        {de:'Ich verstehe nicht.', ko:'이해를 못했어요.', ex:'설명이 필요할 때', gram:'nicht = 부정. 문장 맨 끝에 위치'},
+        {de:'Ja, ich stimme zu.', ko:'네, 동의합니다.', ex:'간단한 동의', gram:'zustimmen = 분리동사. stimme...zu로 분리'},
+      ],
+      A2: [
+        {de:'Ich habe eine kurze Frage dazu.', ko:'이에 대해 짧은 질문이 있어요.', ex:'회의 중 질문할 때', gram:'dazu = da+zu, "그것에 대해". 전치사 대명사 결합'},
+        {de:'Könnten Sie das bitte wiederholen?', ko:'다시 말씀해 주시겠어요?', ex:'못 들었을 때', gram:'Könnten = können의 Konjunktiv II. 정중한 요청'},
+        {de:'Meiner Meinung nach...', ko:'제 생각에는...', ex:'의견 제시 시작', gram:'meiner = mein의 3격(Dativ). 소유격 형용사 변화'},
+        {de:'Ich stimme zu. / Das sehe ich etwas anders.', ko:'동의합니다. / 저는 조금 다르게 봐요.', ex:'동의/반대 표현', gram:'sehe ich = 동사 첫 위치로 어순 도치 없음. anders = 다르게'},
+        {de:'Wer ist für das Protokoll zuständig?', ko:'회의록은 누가 담당하나요?', ex:'역할 확인', gram:'für + 4격. zuständig sein für = ~을 담당하다'},
+      ],
+      B1: [
+        {de:'Könnten wir kurz einen Schritt zurückgehen?', ko:'잠깐 한 걸음 되돌아갈 수 있을까요?', ex:'논의를 되짚을 때', gram:'zurückgehen = 분리동사. Konjunktiv II로 정중하게 제안'},
+        {de:'Ich finde, dass wir mehr Zeit brauchen.', ko:'우리에게 더 많은 시간이 필요하다고 생각해요.', ex:'일정 문제 제기', gram:'dass절 = 부문장, 동사(brauchen)가 맨 뒤로 이동'},
+        {de:'Darf ich kurz unterbrechen?', ko:'잠깐 끼어들어도 될까요?', ex:'발언하고 싶을 때', gram:'dürfen = 허가 조동사. kurz = 잠깐 (시간 부사)'},
+        {de:'Was meinen Sie damit genau?', ko:'그 말이 정확히 무슨 의미인가요?', ex:'명확화 요청', gram:'meinen = 의미하다/생각하다. damit = da+mit (그것으로/그것에 대해)'},
+      ]
+    }
+  },
+  {
+    id:'s3', cat:'lunch', icon:'🍽', title:'점심·커피 타임', sub:'식당·커피·가벼운 대화',
+    grammar: {
+      title: '제안·초대 표현',
+      sections: [
+        { h: 'Lust haben — ~하고 싶다', body: '<strong>Hast du Lust, ... zu gehen?</strong> = "~하러 가고 싶어?"<br>Lust haben + zu부정사. 친한 동료에게 자주 쓰는 표현.' },
+        { h: '음식 주문 표현', body: '<strong>Ich hätte gerne...</strong> = "~를 주세요" (hätte = haben의 Konjunktiv II, 매우 공손)<br><strong>Ich nehme...</strong> = "~로 할게요" (일반적인 주문)' },
+        { h: '형용사 비교급', body: '<strong>gut → besser → am besten</strong> (좋은 → 더 좋은 → 제일 좋은)<br>Das ist <strong>besser</strong> als... = "이게 ...보다 더 좋아요"' },
+      ]
+    },
+    phrases: {
+      A1: [
+        {de:'Was kostet das?', ko:'얼마예요?', ex:'식당/카페에서', gram:'kosten = 가격이 ~이다. Was = 의문사'},
+        {de:'Ich möchte einen Kaffee.', ko:'커피 한 잔 원해요.', ex:'주문할 때', gram:'möchten = wollen의 정중형. einen = 남성명사 4격'},
+        {de:'Das schmeckt gut!', ko:'맛있어요!', ex:'음식 칭찬', gram:'schmecken = 맛이 나다. gut = 좋은'},
+      ],
+      A2: [
+        {de:'Gehst du heute mit zum Mittagessen?', ko:'오늘 같이 점심 먹으러 가?', ex:'동료에게 제안', gram:'mitgehen = 분리동사(같이 가다). zum = zu+dem (3격 축약)'},
+        {de:'Ich kenne ein gutes Restaurant in der Nähe.', ko:'근처에 좋은 식당을 알아.', ex:'식당 추천', gram:'in der Nähe = 근처에(3격). gutes = gut의 형용사 어미 변화(중성 4격)'},
+        {de:'Was nimmst du?', ko:'뭐 시킬 거야?', ex:'메뉴 고를 때', gram:'nehmen = (음식을) 주문하다. 구어체에서 자주 사용'},
+        {de:'Ich hätte gerne einen Kaffee, bitte.', ko:'커피 한 잔 부탁드립니다.', ex:'카페에서', gram:'hätte gerne = haben의 Konjunktiv II + gerne. 매우 공손한 주문 표현'},
+        {de:'Das schmeckt sehr gut!', ko:'이거 정말 맛있다!', ex:'음식 칭찬', gram:'sehr = 매우. schmecken + Dativ: Das schmeckt mir (나한테 맛있어)'},
+      ],
+      B1: [
+        {de:'Hast du Lust, nach der Arbeit etwas trinken zu gehen?', ko:'퇴근 후에 한잔하러 갈래?', ex:'동료에게 제안', gram:'Lust haben + zu부정사. nach der Arbeit = 퇴근 후(3격)'},
+        {de:'Ich empfehle die Tagessuppe — sie ist heute ausgezeichnet.', ko:'오늘의 스프를 추천해요 — 오늘 정말 맛있어요.', ex:'추천할 때', gram:'empfehlen = 추천하다(불규칙). ausgezeichnet = 탁월한'},
+        {de:'Wo gehen wir normalerweise zum Mittagessen?', ko:'보통 어디서 점심 먹어요?', ex:'신규 입사자로서', gram:'normalerweise = 보통(문장 부사). wo = 어디서(의문사)'},
+      ]
+    }
+  },
+  {
+    id:'s4', cat:'email', icon:'✉️', title:'이메일 작성', sub:'업무 메일 표현·요청',
+    grammar: {
+      title: '격식 이메일 구조',
+      sections: [
+        { h: '이메일 시작 인사', body: '<strong>Sehr geehrte Frau [Name],</strong> — 여성에게 격식체<br><strong>Sehr geehrter Herr [Name],</strong> — 남성에게 격식체<br><strong>Liebe/r [Name],</strong> — 친한 동료에게' },
+        { h: '이메일 끝 인사', body: '<strong>Mit freundlichen Grüßen,</strong> — 영어 "Best regards"<br><strong>Viele Grüße,</strong> — 약간 캐주얼<br><strong>Herzliche Grüße,</strong> — 따뜻한 마무리' },
+        { h: '정중한 요청 — Konjunktiv II', body: '<strong>Könnten Sie mir ... schicken?</strong> — 보내주실 수 있나요?<br><strong>Ich wäre Ihnen dankbar, wenn...</strong> — ...해주신다면 감사하겠습니다.<br>wäre = sein의 Konjunktiv II' },
+      ]
+    },
+    phrases: {
+      A1: [
+        {de:'Sehr geehrte Frau/Herr [Name],', ko:'[이름] 씨께,', ex:'격식 이메일 시작', gram:'geehrte/r = ehren(존경하다)의 과거분사. 형용사 어미 변화 주의'},
+        {de:'Mit freundlichen Grüßen,', ko:'감사합니다 / 안녕히 계세요.', ex:'이메일 끝맺음', gram:'Grüßen = Gruß(인사)의 복수형 3격. freundlichen = 형용사 어미'},
+      ],
+      A2: [
+        {de:'Sehr geehrte Frau/Herr [Name],', ko:'[이름] 씨께,', ex:'격식 이메일 시작', gram:'sehr geehrt = 매우 존경하는. 독일 비즈니스 이메일 표준 시작'},
+        {de:'Ich schreibe Ihnen bezüglich...', ko:'...에 관해 연락드립니다.', ex:'목적 언급', gram:'bezüglich + 2격(Genitiv). 격식체 전치사'},
+        {de:'Könnten Sie mir bitte ... schicken?', ko:'...을 보내주시겠어요?', ex:'정중한 요청', gram:'Konjunktiv II + mir(나에게, 3격) + 4격 목적어'},
+        {de:'Ich bestätige den Termin am [Datum].', ko:'[날짜] 약속을 확인합니다.', ex:'일정 확인', gram:'bestätigen = 확인하다. am = an+dem(3격). den Termin = 4격'},
+        {de:'Mit freundlichen Grüßen,', ko:'감사합니다, 안녕히 계세요.', ex:'이메일 끝맺음', gram:'독일 비즈니스 이메일의 표준 마무리'},
+        {de:'Ich freue mich auf Ihre Rückmeldung.', ko:'답변 기다리겠습니다.', ex:'회신 요청', gram:'sich freuen auf + 4격 = ~를 기대하다. Ihre = Sie의 소유격'},
+      ],
+      B1: [
+        {de:'Im Anhang finden Sie...', ko:'첨부 파일에서 ...를 찾으실 수 있습니다.', ex:'파일 첨부할 때', gram:'im Anhang = 첨부 파일에. finden Sie = 동사 도치(격식)'},
+        {de:'Ich wäre Ihnen sehr dankbar, wenn Sie...', ko:'...해주신다면 매우 감사하겠습니다.', ex:'정중한 요청 강조', gram:'wäre = sein의 Konjunktiv II. wenn절 = 조건절, 동사 맨 뒤'},
+        {de:'Für Rückfragen stehe ich gerne zur Verfügung.', ko:'문의사항이 있으시면 언제든지 연락주세요.', ex:'이메일 마무리', gram:'zur Verfügung stehen = 이용 가능하다 (관용 표현)'},
+      ]
+    }
+  },
+  {
+    id:'s5', cat:'smalltalk', icon:'💼', title:'팀 미팅 전후', sub:'가벼운 근황·주말 이야기',
+    grammar: {
+      title: '과거 이야기하기 — Perfekt',
+      sections: [
+        { h: '현재완료(Perfekt) 구조', body: '독일 구어체에서는 과거를 말할 때 주로 <strong>Perfekt</strong>를 사용:<br><strong>haben/sein + 과거분사(Partizip II)</strong><br>Ich <strong>habe</strong> Fußball <strong>gespielt</strong>. (축구를 했어)<br>Ich <strong>bin</strong> nach Berlin <strong>gefahren</strong>. (베를린에 갔어)' },
+        { h: 'haben vs sein', body: '<strong>haben</strong>: 대부분의 동사<br><strong>sein</strong>: 이동/상태변화 동사<br>fahren→bin gefahren, gehen→bin gegangen, kommen→bin gekommen' },
+        { h: '규칙 동사 과거분사', body: 'ge- + 어간 + -t<br>spielen → ge<strong>spiel</strong>t &nbsp; kaufen → ge<strong>kauf</strong>t<br>arbeiten → ge<strong>arbeit</strong>et' },
+      ]
+    },
+    phrases: {
+      A1: [
+        {de:'Was hast du gemacht?', ko:'뭐 했어?', ex:'주말 이야기', gram:'hast...gemacht = machen의 Perfekt. gemacht = 과거분사'},
+        {de:'Ich war zu Hause.', ko:'집에 있었어.', ex:'간단한 답변', gram:'war = sein의 과거형(Präteritum). zu Hause = 집에'},
+      ],
+      A2: [
+        {de:'Was hast du am Wochenende gemacht?', ko:'주말에 뭐 했어?', ex:'월요일 대화', gram:'am Wochenende = 3격. hast...gemacht = Perfekt 구조'},
+        {de:'Ich war im Kino / beim Sport.', ko:'영화관에 / 운동하러 갔어.', ex:'주말 얘기', gram:'im = in+dem(3격). beim = bei+dem(3격)'},
+        {de:'Hast du das Fußballspiel gesehen?', ko:'축구 경기 봤어?', ex:'스포츠 대화', gram:'gesehen = sehen의 과거분사(불규칙). Ja/Nein 질문: 동사 첫 위치'},
+        {de:'Ich plane, nach Bayern zu fahren.', ko:'바이에른에 갈 계획이야.', ex:'여행 계획', gram:'planen + zu부정사. nach + 지명 = ~로(방향, 전치사)'},
+      ],
+      B1: [
+        {de:'Ich habe ein tolles Konzert besucht — absolut empfehlenswert!', ko:'멋진 콘서트에 다녀왔어 — 정말 추천해!', ex:'주말 경험 공유', gram:'besucht = besuchen의 과거분사. empfehlenswert = 추천할 만한 (형용사)'},
+        {de:'Wir haben uns das neue Restaurant angeschaut.', ko:'우리 새 식당 가봤어.', ex:'함께 한 경험', gram:'anschauen = 분리동사. uns = wir의 4격(재귀). angeschaut = 과거분사'},
+      ]
+    }
+  },
+  {
+    id:'s6', cat:'meeting', icon:'📋', title:'보고·업데이트', sub:'진행상황·문제·일정',
+    grammar: {
+      title: '미래·계획 표현',
+      sections: [
+        { h: 'werden — 미래형', body: '<strong>werden + 부정사</strong> = ~할 것이다<br>Ich <strong>werde</strong> den Bericht <strong>schicken</strong>. (보고서를 보낼 거예요)' },
+        { h: '현재형으로 미래 표현', body: '독일어에서는 현재형 + 시간 부사로도 미래를 표현:<br>Ich <strong>schicke</strong> es morgen. (내일 보낼게요)<br>= Ich werde es morgen schicken.과 같은 의미' },
+        { h: '조건절 — wenn', body: '<strong>Wenn</strong> + 부문장, Hauptsatz.<br>Wenn es ein Problem gibt, sage ich Bescheid. (문제가 있으면 알려드릴게요)<br>wenn절에서 동사는 맨 끝으로!' },
+      ]
+    },
+    phrases: {
+      A1: [
+        {de:'Es gibt ein Problem.', ko:'문제가 있습니다.', ex:'문제 보고', gram:'es gibt = there is/are. ein Problem = 4격'},
+        {de:'Ich bin fertig.', ko:'완료했습니다.', ex:'완료 보고', gram:'fertig sein = 완료되다. fertig = 다 된, 완료된'},
+      ],
+      A2: [
+        {de:'Das Projekt läuft gut / nach Plan.', ko:'프로젝트가 잘/계획대로 진행 중입니다.', ex:'긍정적 보고', gram:'laufen = 진행되다(비유적). nach Plan = 계획대로(3격)'},
+        {de:'Wir haben ein kleines Problem.', ko:'작은 문제가 있습니다.', ex:'문제 언급', gram:'haben + 4격. kleines = klein의 형용사 어미(중성 4격)'},
+        {de:'Die Deadline ist nächste Woche.', ko:'마감은 다음 주입니다.', ex:'일정 언급', gram:'nächste Woche = 다음 주(4격, 시간 표현)'},
+        {de:'Ich brauche noch zwei Tage.', ko:'이틀이 더 필요합니다.', ex:'시간 요청', gram:'brauchen + 4격. noch = 아직/더. zwei Tage = 4격'},
+        {de:'Können wir das Treffen verschieben?', ko:'미팅을 미룰 수 있을까요?', ex:'일정 변경', gram:'verschieben = 미루다(불규칙). können = 조동사, 동사 맨 끝'},
+      ],
+      B1: [
+        {de:'Ich werde das bis Freitag erledigen.', ko:'금요일까지 처리하겠습니다.', ex:'확실한 약속', gram:'werde...erledigen = werden 미래형. bis Freitag = 금요일까지(4격)'},
+        {de:'Es könnte zu einer kleinen Verzögerung kommen.', ko:'약간의 지연이 있을 수 있습니다.', ex:'지연 예고', gram:'könnte = können의 Konjunktiv II. zu...kommen = 발생하다'},
+        {de:'Wenn es Probleme gibt, melde ich mich sofort.', ko:'문제가 생기면 바로 연락드리겠습니다.', ex:'신뢰 표현', gram:'wenn절 = 부문장(동사 맨 뒤). melde...mich = sich melden(연락하다) 분리'},
+      ]
+    }
+  },
+];
+
+// ══════════════════════════════════════════
+// API KEY MANAGEMENT
+// ══════════════════════════════════════════
+function getApiKey() {
+  return localStorage.getItem('buero_apikey') || '';
+}
+
+function checkApiKey() {
+  const key = getApiKey();
+  const tabBar = document.querySelector('.tab-bar');
+  if (!key || !key.startsWith('sk-ant-')) {
+    document.getElementById('apikey-overlay').classList.add('show');
+    tabBar.style.display = 'none';
+    return false;
+  }
+  document.getElementById('apikey-overlay').classList.remove('show');
+  tabBar.style.display = 'flex';
+  return true;
+}
+
+function validateKey() {
+  const val = document.getElementById('apikey-input').value.trim();
+  const btn = document.getElementById('apikey-confirm');
+  const err = document.getElementById('key-error');
+  const isValid = val.startsWith('sk-ant-') && val.length > 20;
+  btn.disabled = !isValid;
+  btn.style.opacity = isValid ? '1' : '0.4';
+  err.style.display = (!isValid && val.length > 5) ? 'block' : 'none';
+}
+
+function toggleKeyVisibility() {
+  const inp = document.getElementById('apikey-input');
+  const btn = document.getElementById('eye-btn');
+  if (inp.type === 'password') { inp.type = 'text'; btn.textContent = '🙈'; }
+  else { inp.type = 'password'; btn.textContent = '👁'; }
+}
+
+function toggleSettingsKeyVisibility() {
+  const inp = document.getElementById('settings-key-input');
+  const btn = document.getElementById('settings-eye-btn');
+  if (inp.type === 'password') { inp.type = 'text'; btn.textContent = '🙈'; }
+  else { inp.type = 'password'; btn.textContent = '👁'; }
+}
+
+function saveApiKey() {
+  const val = document.getElementById('apikey-input').value.trim();
+  if (!val.startsWith('sk-ant-')) return;
+  localStorage.setItem('buero_apikey', val);
+  document.getElementById('apikey-overlay').classList.remove('show');
+  document.querySelector('.tab-bar').style.display = 'flex';
+  showScreen('home');
+}
+
+function updateApiKey() {
+  const val = document.getElementById('settings-key-input').value.trim();
+  if (!val.startsWith('sk-ant-') || val.length < 20) {
+    alert('올바른 API 키를 입력해주세요 (sk-ant-로 시작)');
+    return;
+  }
+  localStorage.setItem('buero_apikey', val);
+  closeSettings();
+  alert('API 키가 업데이트되었습니다.');
+}
+
+function deleteApiKey() {
+  if (!confirm('API 키를 삭제하면 AI 기능을 사용할 수 없습니다. 계속하시겠어요?')) return;
+  localStorage.removeItem('buero_apikey');
+  closeSettings();
+  document.getElementById('apikey-overlay').classList.add('show');
+  document.querySelector('.tab-bar').style.display = 'none';
+}
+
+function resetAllData() {
+  if (!confirm('모든 학습 데이터를 초기화할까요? 되돌릴 수 없습니다.')) return;
+  localStorage.removeItem('buero_deutsch');
+  localStorage.removeItem('buero_ai_phrases');
+  state.progress = {}; state.streak = 0; state.totalSessions = 0; state.aiPhrases = {};
+  closeSettings();
+  renderStats();
+  renderScenarios();
+  alert('초기화 완료!');
+}
+
+function showSettings() {
+  const key = getApiKey();
+  // show masked key in settings
+  if (key) {
+    document.getElementById('settings-key-input').value = key;
+  }
+  document.getElementById('settings-modal').classList.add('show');
+}
+
+function closeSettings() {
+  document.getElementById('settings-modal').classList.remove('show');
+}
+
+// ══════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════
+let state = {
+  level: 'A2',
+  currentScenario: null,
+  chatHistory: [],
+  chatSystemPrompt: '',
+  chatScenarioTitle: '',
+  chatMode: 'text',
+  voiceMode: false,
+  aiPhrases: {},
+  isGenerating: false,
+  hintsOn: false,
+  isListening: false,
+  isWaitingAI: false,
+  isSpeaking: false,
+  recognition: null,
+  silenceTimer: null,
+  prevScreen: 'home',
+  progress: {},
+  streak: 0,
+  totalSessions: 0,
+  lastDate: null,
+};
+
+function loadStorage() {
+  try {
+    const d = JSON.parse(localStorage.getItem('buero_deutsch') || '{}');
+    if (d.level) state.level = d.level;
+    if (d.progress) state.progress = d.progress;
+    if (d.streak) state.streak = d.streak;
+    if (d.totalSessions) state.totalSessions = d.totalSessions;
+    if (d.lastDate) state.lastDate = d.lastDate;
+    checkStreak();
+  } catch(e) {}
+}
+
+function saveStorage() {
+  try {
+    localStorage.setItem('buero_deutsch', JSON.stringify({
+      level: state.level,
+      progress: state.progress,
+      streak: state.streak,
+      totalSessions: state.totalSessions,
+      lastDate: state.lastDate,
+    }));
+  } catch(e) {}
+}
+
+function checkStreak() {
+  const today = new Date().toDateString();
+  const yesterday = new Date(Date.now()-86400000).toDateString();
+  if (state.lastDate === today) return;
+  if (state.lastDate === yesterday) state.streak++;
+  else if (state.lastDate !== today) state.streak = 1;
+  state.lastDate = today;
+  saveStorage();
+}
+
+// ══════════════════════════════════════════
+// SCREEN NAV
+// ══════════════════════════════════════════
+function showScreen(id) {
+  // 모든 screen 숨기기
+  document.querySelectorAll('.screen').forEach(s => {
+    s.classList.remove('active');
+  });
+  // 해당 screen 보이기
+  const el = document.getElementById('screen-' + id);
+  if (!el) return;
+  el.classList.add('active');
+
+  // 탭 하이라이트
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
+  if (id === 'home') document.getElementById('tab-home').classList.add('on');
+  else if (id === 'chat') document.getElementById('tab-chat').classList.add('on');
+  else if (id === 'print') document.getElementById('tab-print').classList.add('on');
+}
+
+function goHome() { stopListening(); showScreen('home'); }
+function goBack() { stopListening(); showScreen(state.prevScreen); }
+
+function switchTab(name) {
+  stopListening();
+  if (name === 'home') { showScreen('home'); }
+  else if (name === 'chat-free') {
+    state.prevScreen = 'home';
+    launchFreeChat();
+    showScreen('chat');
+    document.getElementById('tab-chat').classList.add('on');
+  }
+  else if (name === 'print') { buildPrintScreen(); showScreen('print'); }
+}
+
+// ══════════════════════════════════════════
+// HOME
+// ══════════════════════════════════════════
+function setLevel(lv, btn) {
+  state.level = lv;
+  document.querySelectorAll('.level-pill').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  renderScenarios();
+  saveStorage();
+}
+
+function filterCat(cat, btn) {
+  document.querySelectorAll('.quick-btn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  renderScenarios(cat);
+}
+
+function renderScenarios(cat='all') {
+  const grid = document.getElementById('scenario-grid');
+  const list = cat === 'all' ? SCENARIOS : SCENARIOS.filter(s => s.cat === cat);
+  grid.innerHTML = list.map(s => {
+    const prog = state.progress[s.id] || 0;
+    const phrases = s.phrases[state.level] || s.phrases['A2'];
+    return `<div class="scenario-card" onclick="openLesson('${s.id}')">
+      <span class="sc-icon">${s.icon}</span>
+      <div class="sc-title">${s.title}</div>
+      <div class="sc-sub">${s.sub}</div>
+      <div class="sc-badge">${phrases.length}개</div>
+      <div class="sc-prog"><div class="sc-prog-fill" style="width:${prog}%"></div></div>
+    </div>`;
+  }).join('');
+}
+
+function renderStats() {
+  const total = SCENARIOS.reduce((a,s) => a + (state.progress[s.id]||0), 0);
+  const avg = Math.round(total / SCENARIOS.length);
+  document.getElementById('stats-row').innerHTML = `
+    <div class="stat-card"><div class="stat-num">${state.streak}</div><div class="stat-label">연속 학습일</div></div>
+    <div class="stat-card"><div class="stat-num">${state.totalSessions}</div><div class="stat-label">대화 횟수</div></div>
+    <div class="stat-card"><div class="stat-num">${avg}%</div><div class="stat-label">전체 진행률</div></div>
+  `;
+}
+
+// ══════════════════════════════════════════
+// LESSON
+// ══════════════════════════════════════════
+function openLesson(id) {
+  state.currentScenario = SCENARIOS.find(s => s.id === id);
+  const sc = state.currentScenario;
+  const phrases = sc.phrases[state.level] || sc.phrases['A2'];
+
+  document.getElementById('lesson-nav-title').innerHTML =
+    `${sc.icon} ${sc.title}<span class="nav-sub">${sc.sub} · ${state.level}</span>`;
+
+  const list = document.getElementById('phrase-list');
+  list.innerHTML = '<div id="base-phrases-inner">' + phrases.map((p, i) => `
+    <div class="phrase-card" id="pc${i}" onclick="togglePhrase(${i})">
+      <div class="ph-row">
+        <div class="ph-play" onclick="event.stopPropagation();speak('${esc(p.de)}')">🔊</div>
+        <div style="flex:1">
+          <div class="ph-de">${p.de}</div>
+          <div class="ph-ko">${p.ko}</div>
+        </div>
+      </div>
+      <div class="ph-details">
+        <div class="ph-example">예: ${p.ex}</div>
+        <div class="grammar-box">
+          <div class="grammar-tag">📝 문법 포인트</div>
+          <div class="grammar-text">${p.gram}</div>
+        </div>
+      </div>
+    </div>
+  `).join('') + '</div>';
+
+  state.prevScreen = 'home';
+  showScreen('lesson');
+  renderAIPhrases();
+
+  // update progress
+  if (!state.progress[id]) state.progress[id] = 0;
+  state.progress[id] = Math.min(100, state.progress[id] + 10);
+  saveStorage();
+  renderStats();
+}
+
+function esc(s) { return s.replace(/'/g,"&#39;"); }
+
+function togglePhrase(i) {
+  const card = document.getElementById('pc'+i);
+  card.classList.toggle('expanded');
+}
+
+function playAll() {
+  const sc = state.currentScenario;
+  if (!sc) return;
+  const phrases = sc.phrases[state.level] || sc.phrases['A2'];
+  let i = 0;
+  function next() {
+    if (i >= phrases.length) return;
+    const utt = new SpeechSynthesisUtterance(phrases[i].de);
+    utt.lang = 'de-DE'; utt.rate = 0.82;
+    utt.onend = () => { i++; setTimeout(next, 700); };
+    window.speechSynthesis.speak(utt);
+  }
+  window.speechSynthesis.cancel();
+  next();
+}
+
+// ══════════════════════════════════════════
+// GRAMMAR MODAL
+// ══════════════════════════════════════════
+function openGrammarModal() {
+  const sc = state.currentScenario;
+  if (!sc) return;
+  const g = sc.grammar;
+  let html = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+    <h2>${g.title}</h2>
+    <button onclick="closeGrammar()" style="background:none;border:none;color:var(--text2);font-size:22px;cursor:pointer">✕</button>
+  </div>`;
+  g.sections.forEach(sec => {
+    html += `<div class="grammar-section"><h3>${sec.h}</h3>`;
+    if (sec.body) html += `<p>${sec.body}</p>`;
+    if (sec.table) {
+      html += `<table class="grammar-table"><thead><tr>${sec.table[0].map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>`;
+      sec.table.slice(1).forEach(row => {
+        html += `<tr>${row.map(c=>`<td>${c}</td>`).join('')}</tr>`;
+      });
+      html += `</tbody></table>`;
+    }
+    html += `</div>`;
+  });
+  document.getElementById('grammar-content').innerHTML = html;
+  document.getElementById('grammar-modal').classList.add('show');
+}
+
+function closeGrammar() {
+  document.getElementById('grammar-modal').classList.remove('show');
+}
+
+// ══════════════════════════════════════════
+// CHAT
+// ══════════════════════════════════════════
+function startRoleplay() {
+  const sc = state.currentScenario;
+  const phrases = sc.phrases[state.level] || sc.phrases['A2'];
+  const phraseList = phrases.map(p => `- ${p.de} (${p.ko})`).join('\n');
+
+  state.chatSystemPrompt = `You are a friendly German colleague practicing workplace German with a Korean professional in Germany. Their level is ${state.level}.
+
+Scenario: ${sc.title} — ${sc.sub}
+
+Key phrases for this scenario (use and encourage these naturally):
+${phraseList}
+
+Rules:
+1. Speak primarily in German at ${state.level} level
+2. When the user makes a grammar mistake, gently correct: "Fast! Man sagt besser: [correction]" then continue naturally
+3. For new/difficult vocabulary, add Korean in (괄호): e.g., "Wie war dein Wochenende? (주말이 어땠어?)"
+4. Keep responses SHORT — max 2-3 sentences (important for voice use while driving)
+5. Be warm, encouraging, and natural like a real colleague
+6. Do NOT give long grammar explanations during conversation — just model correct usage
+7. If the user seems stuck, offer a hint: "Du könntest sagen: ..."
+8. IMPORTANT: If the user writes or speaks in Korean, switch to Korean to explain, answer grammar questions, or help them understand. Then invite them back to German practice. This bilingual mode is encouraged.
+
+Start the conversation naturally in your role.`;
+
+  document.getElementById('chat-nav-title').innerHTML =
+    `${sc.icon} ${sc.title}<span class="nav-sub">AI 롤플레이 · ${state.level}</span>`;
+
+  state.chatHistory = [];
+  state.prevScreen = 'lesson';
+  clearChat();
+  showScreen('chat');
+  document.getElementById('tab-chat').classList.add('on');
+
+  state.totalSessions++;
+  saveStorage();
+  setTimeout(() => getAIResponse(null, true), 300);
+}
+
+function launchFreeChat() {
+  state.chatSystemPrompt = `You are a friendly German language tutor helping a Korean professional working in Germany. Their level is ${state.level}.
+
+Rules:
+1. Have natural workplace-related conversations in German at ${state.level} level
+2. Gently correct mistakes: "Fast! Besser: [correction]"  
+3. Add Korean hints for difficult words in (괄호)
+4. Keep responses SHORT — max 2-3 sentences (voice use while driving)
+5. Topics: office life, colleagues, meetings, lunch, small talk, German culture at work
+6. Be encouraging and conversational
+7. Occasionally suggest useful phrases relevant to the conversation
+8. IMPORTANT: If the user writes or speaks in Korean, switch fully to Korean to answer their question, explain grammar, or help them find the right expression. Then gently guide them back to German. Bilingual interaction is welcome.
+
+Start with a friendly German greeting and a simple workplace question.`;
+
+  document.getElementById('chat-nav-title').innerHTML =
+    `💬 자유 대화<span class="nav-sub">직장 독일어 · ${state.level}</span>`;
+
+  state.chatHistory = [];
+  clearChat();
+  state.totalSessions++;
+  saveStorage();
+  setTimeout(() => getAIResponse(null, true), 300);
+}
+
+function clearChat() {
+  document.getElementById('chat-messages').innerHTML =
+    `<div class="typing-dots" id="typing-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>`;
+}
+
+function addMsg(role, text) {
+  const msgs = document.getElementById('chat-messages');
+  const typing = document.getElementById('typing-dots');
+  const div = document.createElement('div');
+  div.className = `msg ${role}`;
+  const time = new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'});
+  div.innerHTML = `<div class="msg-bubble">${text.replace(/\n/g,'<br>')}</div><div class="msg-meta">${time}</div>`;
+  msgs.insertBefore(div, typing);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+async function getAIResponse(userText, isOpening) {
+  if (state.isWaitingAI) return;
+  state.isWaitingAI = true;
+
+  const typing = document.getElementById('typing-dots');
+  typing.classList.add('show');
+  document.getElementById('chat-messages').scrollTop = 999999;
+
+  if (userText) state.chatHistory.push({role:'user', content: userText});
+
+  const msgs = isOpening
+    ? [{role:'user', content:'Starte das Gespräch jetzt auf Deutsch.'}]
+    : state.chatHistory;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json', 'x-api-key': getApiKey(), 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true'},
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1000,
+        system: state.chatSystemPrompt,
+        messages: msgs,
+      })
+    });
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      throw new Error(res.status + ' ' + (errData.error?.message || res.statusText));
+    }
+    const data = await res.json();
+    const aiText = data.content?.[0]?.text || '죄송해요, 다시 시도해 주세요.';
+    typing.classList.remove('show');
+    addMsg('ai', aiText);
+    state.chatHistory.push({role:'assistant', content: aiText});
+    if (state.voiceMode) {
+      // 핸즈프리: TTS 완료 후 자동으로 마이크 재시작
+      speakText(aiText, () => {
+        if (state.voiceMode && !state.isWaitingAI) {
+          setTimeout(() => {
+            if (state.voiceMode && !state.isWaitingAI && !state.isSpeaking) {
+              startListening();
+            }
+          }, 400); // TTS 끝나고 0.4초 후 마이크 ON
+        }
+      });
+    }
+  } catch(e) {
+    typing.classList.remove('show');
+    const errMsg = e.message || String(e);
+    if (errMsg.includes('401') || errMsg.includes('auth')) {
+      addMsg('ai', '❌ API 키 오류입니다. 설정(⚙️)에서 키를 확인해주세요.');
+    } else if (errMsg.includes('fetch') || errMsg.includes('network') || errMsg.includes('Failed')) {
+      addMsg('ai', '❌ 네트워크 오류입니다. 인터넷 연결을 확인해주세요.');
+    } else {
+      addMsg('ai', '❌ 오류: ' + errMsg + ' — 설정(⚙️)에서 API 키를 확인해주세요.');
+    }
+    console.error('API error:', e);
+  }
+  state.isWaitingAI = false;
+}
+
+async function sendMsg() {
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text || state.isWaitingAI) return;
+  input.value = '';
+  if (state.chatMode === 'analyze') {
+    await analyzeGrammar(text);
+  } else {
+    addMsg('user', text);
+    if (state.voiceMode) updateVoiceCycleStatus('waiting');
+    await getAIResponse(text, false);
+  }
+}
+
+// ══════════════════════════════════════════
+// VOICE
+// ══════════════════════════════════════════
+function setMode(mode) {
+  state.chatMode = mode; // 'text' | 'voice' | 'analyze'
+  state.voiceMode = mode === 'voice';
+  document.getElementById('mode-text').classList.toggle('on', mode === 'text');
+  document.getElementById('mode-voice').classList.toggle('on', mode === 'voice');
+  document.getElementById('mode-analyze').classList.toggle('on', mode === 'analyze');
+  const vs = document.getElementById('voice-status');
+  const inp = document.getElementById('chat-input');
+  if (mode === 'voice') {
+    vs.textContent = '🎙 핸즈프리 모드 켜짐';
+    inp.placeholder = '독일어 또는 한국어로 말하세요...';
+    // 음성 모드 진입 즉시 마이크 시작
+    setTimeout(() => {
+      if (state.voiceMode && !state.isListening && !state.isSpeaking) startListening();
+    }, 300);
+  } else if (mode === 'analyze') {
+    vs.textContent = '🔬 문법 분석 모드 — 분석할 독일어 문장을 입력하세요';
+    vs.classList.add('on');
+    inp.placeholder = '분석할 독일어 문장 입력...';
+    stopListening();
+  } else {
+    vs.textContent = '';
+    vs.classList.remove('on');
+    inp.placeholder = '독일어로 입력하세요...';
+    stopListening(); // 음성 모드 해제 시 마이크 정지
+  }
+}
+
+// ══════════════════════════════════════════
+// GRAMMAR ANALYSIS
+// ══════════════════════════════════════════
+const ANALYZE_SYSTEM = `You are a German grammar analysis expert for Korean learners. When given a German sentence or phrase, analyze it in detail and respond ONLY with a JSON object — no markdown, no extra text.
+
+JSON structure:
+{
+  "original": "the input sentence",
+  "verdict": "correct" | "has_errors" | "good_but_unnatural",
+  "correction": null or "corrected sentence if errors",
+  "correction_explanation": null or "Korean explanation of what was wrong",
+  "tokens": [
+    {"word": "Ich", "type": "subject", "label": "주어"},
+    {"word": "muss", "type": "modal", "label": "조동사"},
+    {"word": "morgen", "type": "adverb", "label": "시간부사"},
+    {"word": "ins", "type": "prep", "label": "전치사+관사"},
+    {"word": "Büro", "type": "object", "label": "목적어"},
+    {"word": "gehen", "type": "verb", "label": "동사(문장끝)"}
+  ],
+  "grammar_points": [
+    "Korean explanation of key grammar rule 1 — be specific and educational",
+    "Korean explanation of key grammar rule 2"
+  ],
+  "alternatives": [
+    {"de": "alternative expression 1", "ko": "Korean meaning", "note": "뉘앙스 설명"},
+    {"de": "alternative expression 2", "ko": "Korean meaning", "note": "뉘앙스 설명"},
+    {"de": "alternative expression 3", "ko": "Korean meaning", "note": "뉘앙스 설명"}
+  ]
+}
+
+Token types: subject, verb, modal, object, adverb, prep, other
+Keep grammar_points concise but educational (Korean).
+Always provide 2-3 alternatives showing different registers (formal/informal/written).
+If input is Korean (not German), translate to German first and analyze the translation.`;
+
+async function analyzeGrammar(text) {
+  if (state.isWaitingAI) return;
+  state.isWaitingAI = true;
+
+  // show user bubble
+  const msgs = document.getElementById('chat-messages');
+  const typing = document.getElementById('typing-dots');
+  const userDiv = document.createElement('div');
+  userDiv.className = 'msg user';
+  userDiv.innerHTML = `<div class="msg-bubble">🔬 ${text}</div><div class="msg-meta">문법 분석 요청</div>`;
+  msgs.insertBefore(userDiv, typing);
+  msgs.scrollTop = msgs.scrollHeight;
+
+  typing.classList.add('show');
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json', 'x-api-key': getApiKey(), 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true'},
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1000,
+        system: ANALYZE_SYSTEM,
+        messages: [{role:'user', content: text}],
+      })
+    });
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      throw new Error(res.status + ' ' + (errData.error?.message || res.statusText));
+    }
+    const data = await res.json();
+    let raw = data.content?.[0]?.text || '{}';
+    raw = raw.replace(/```json|```/g,'').trim();
+    const result = JSON.parse(raw);
+    typing.classList.remove('show');
+    renderAnalysisCard(result, msgs, typing);
+  } catch(e) {
+    typing.classList.remove('show');
+    const errDiv = document.createElement('div');
+    errDiv.className = 'msg ai';
+    const em = e.message || String(e);
+    const txt = em.includes('401') ? '❌ API 키 오류 — 설정(⚙️)에서 키를 확인해주세요.' : '❌ 오류: ' + em;
+    errDiv.innerHTML = `<div class="msg-bubble">${txt}</div>`;
+    msgs.insertBefore(errDiv, typing);
+    console.error('Analyze error:', e);
+  }
+  state.isWaitingAI = false;
+}
+
+function renderAnalysisCard(r, msgs, typing) {
+  const verdictMap = {
+    correct:          {cls:'verdict-ok',  label:'✅ 정확한 표현'},
+    has_errors:       {cls:'verdict-fix', label:'⚠️ 교정 필요'},
+    good_but_unnatural:{cls:'verdict-good',label:'💡 자연스럽게'},
+  };
+  const v = verdictMap[r.verdict] || verdictMap['correct'];
+
+  // tokens html
+  const tokenHtml = (r.tokens||[]).map(t =>
+    `<div class="token tok-${t.type||'other'}">
+      <div class="token-word">${t.word}</div>
+      <div class="token-label">${t.label}</div>
+    </div>`
+  ).join('');
+
+  // grammar points
+  const gpHtml = (r.grammar_points||[]).map(g =>
+    `<div class="analysis-point">• ${g}</div>`
+  ).join('');
+
+  // correction
+  const corrHtml = r.correction ? `
+    <div class="analysis-section">
+      <div class="analysis-section-title"><span>✏️</span> 교정</div>
+      <div class="correction-box">
+        <strong>오류:</strong> ${r.original}<br>
+        <span class="fixed">→ ${r.correction}</span><br><br>
+        ${r.correction_explanation||''}
+      </div>
+    </div>` : '';
+
+  // alternatives — clicking fills input
+  const altHtml = (r.alternatives||[]).map(a =>
+    `<div class="alt-chip" onclick="document.getElementById('chat-input').value='${a.de.replace(/'/g,"\\'")}'" title="탭하면 입력창에 복사">
+      <span>${a.de}</span>
+      <em>${a.ko} · ${a.note}</em>
+    </div>`
+  ).join('');
+
+  const card = document.createElement('div');
+  card.className = 'analysis-card';
+  card.innerHTML = `
+    <div class="analysis-header">
+      <div class="orig">${r.original}</div>
+      <div class="analysis-verdict ${v.cls}">${v.label}</div>
+    </div>
+    ${corrHtml}
+    <div class="analysis-section">
+      <div class="analysis-section-title"><span>🧩</span> 문장 구조</div>
+      <div class="token-row">${tokenHtml}</div>
+    </div>
+    <div class="analysis-section">
+      <div class="analysis-section-title"><span>📐</span> 문법 포인트</div>
+      ${gpHtml}
+    </div>
+    <div class="analysis-section">
+      <div class="analysis-section-title"><span>💬</span> 다른 표현 (탭하면 복사)</div>
+      <div>${altHtml}</div>
+    </div>
+  `;
+  msgs.insertBefore(card, typing);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function toggleHints() {
+  state.hintsOn = !state.hintsOn;
+  const btn = document.getElementById('mode-hint');
+  btn.classList.toggle('on', state.hintsOn);
+  btn.textContent = state.hintsOn ? '💡 힌트 켜짐' : '💡 힌트 켜기';
+}
+
+function toggleMic() {
+  if (state.isListening) stopListening();
+  else startListening();
+}
+
+function startListening() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) {
+    document.getElementById('voice-status').textContent = '이 브라우저는 음성 인식을 지원하지 않습니다 (Chrome 권장)';
+    return;
+  }
+  if (state.isSpeaking) { window.speechSynthesis.cancel(); state.isSpeaking = false; }
+
+  // 현재 입력창 내용으로 언어 감지 (비어있으면 독일어 기본)
+  const inputEl = document.getElementById('chat-input');
+  const currentInput = inputEl ? inputEl.value : '';
+  const recLang = detectInputLang(currentInput) ;
+
+  const rec = new SR();
+  rec.lang = recLang;          // 한국어/독일어 자동 선택
+  rec.continuous = false;      // ← 한 발화씩 처리 (중복 방지)
+  rec.interimResults = true;   // 중간 결과로 실시간 표시
+  rec.maxAlternatives = 1;
+  state.recognition = rec;
+
+  // resultIndex 기준으로만 새 결과 처리 (누적 방지 핵심)
+  let accumulatedFinal = '';
+
+  rec.onstart = () => {
+    state.isListening = true;
+    accumulatedFinal = '';
+    document.getElementById('chat-input').value = '';
+    document.getElementById('btn-mic').classList.add('on');
+    const langLabel = rec.lang === 'ko-KR' ? '한국어로 말하세요' : '독일어로 말하세요';
+    document.getElementById('voice-status').textContent = '🔴 듣고 있어요... ' + langLabel;
+    document.getElementById('voice-status').classList.add('on');
+  };
+
+  rec.onresult = (e) => {
+    clearTimeout(state.silenceTimer);
+
+    // e.resultIndex부터만 처리 — 이전 결과 재처리 방지
+    let newFinal = '';
+    let interim = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      if (e.results[i].isFinal) {
+        newFinal += e.results[i][0].transcript;
+      } else {
+        interim += e.results[i][0].transcript;
+      }
+    }
+
+    if (newFinal) accumulatedFinal += newFinal;
+
+    const displayText = accumulatedFinal + interim;
+    const input = document.getElementById('chat-input');
+    if (input) input.value = displayText;
+
+    const vs = document.getElementById('voice-status');
+    if (vs) {
+      if (state.voiceMode) {
+        vs.textContent = interim ? '🗣 말씀 중...' : '⏸ 잠깐 멈춤 — 계속 말하거나 기다리세요';
+      } else {
+        vs.textContent = interim ? '🗣 말씀 중...' : '⏸ 잠깐 멈춤 — 계속 말하거나 전송 버튼 탭';
+      }
+    }
+
+    // 발화 완료(isFinal) 후 1.8초 침묵 → 자동 전송
+    if (accumulatedFinal.trim()) {
+      state.silenceTimer = setTimeout(() => {
+        if (accumulatedFinal.trim() && !state.isWaitingAI) {
+          stopListening();
+          sendMsg();
+        }
+      }, 1800);
+    }
+  };
+
+  rec.onerror = (e) => {
+    // 'no-speech'는 조용한 상황 — 에러 아님, 재시작
+    if (e.error === 'no-speech') {
+      if (state.isListening && !state.isWaitingAI) {
+        try { rec.start(); } catch(err) {}
+      }
+      return;
+    }
+    const vs = document.getElementById('voice-status');
+    if (vs) {
+      vs.textContent = e.error === 'not-allowed'
+        ? '❌ 마이크 권한을 허용해주세요'
+        : '음성 오류: ' + e.error;
+      vs.classList.remove('on');
+    }
+    stopListening();
+  };
+
+  // continuous:false 이므로 한 발화 끝나면 onend 호출됨
+  // 아직 말하는 중이면(interim 있거나 짧은 pause) 재시작
+  rec.onend = () => {
+    if (!state.isListening || state.isWaitingAI) return;
+    // silenceTimer가 이미 전송 예약됐으면 재시작 안 함
+    if (state.silenceTimer && accumulatedFinal.trim()) return;
+    // 계속 듣기 — 새 인스턴스로 재시작
+    try { rec.start(); } catch(err) {}
+  };
+
+  rec.start();
+}
+
+function stopListening() {
+  state.isListening = false;
+  clearTimeout(state.silenceTimer);
+  if (state.recognition) {
+    try { state.recognition.stop(); } catch(e) {}
+    state.recognition = null;
+  }
+  const btn = document.getElementById('btn-mic');
+  if (btn) btn.classList.remove('on');
+  const vs = document.getElementById('voice-status');
+  if (vs) {
+    vs.classList.remove('on');
+    if (state.voiceMode) {
+      vs.textContent = '🎙 핸즈프리 모드 켜짐';
+    } else {
+      vs.textContent = '';
+    }
+  }
+}
+
+function speakAI(el) {
+  const text = el.getAttribute('data-text');
+  if (text) speak(text);
+}
+
+function speak(text) {
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  const utt = new SpeechSynthesisUtterance(text);
+  utt.lang = 'de-DE'; utt.rate = 0.82;
+  window.speechSynthesis.speak(utt);
+}
+
+// 텍스트에서 언어별 세그먼트 분리 후 순서대로 읽기
+// onDone: 읽기 완료 후 호출할 콜백 (핸즈프리 자동 마이크 재시작용)
+function speakText(text, onDone) {
+  if (!window.speechSynthesis) { if (onDone) onDone(); return; }
+  window.speechSynthesis.cancel();
+  state.isSpeaking = true;
+  updateVoiceCycleStatus('speaking');
+
+  const segments = splitByLanguage(text);
+  if (segments.length === 0) {
+    state.isSpeaking = false;
+    updateVoiceCycleStatus('idle');
+    if (onDone) onDone();
+    return;
+  }
+
+  let idx = 0;
+  function speakNext() {
+    if (idx >= segments.length) {
+      state.isSpeaking = false;
+      updateVoiceCycleStatus('idle');
+      if (onDone) onDone();
+      return;
+    }
+    const seg = segments[idx++];
+    if (!seg.text.trim()) { speakNext(); return; }
+    const utt = new SpeechSynthesisUtterance(seg.text.trim());
+    utt.lang = seg.isKorean ? 'ko-KR' : 'de-DE';
+    utt.rate = seg.isKorean ? 0.95 : 0.88;
+    utt.onend = () => setTimeout(speakNext, 120);
+    utt.onerror = () => { speakNext(); };
+    window.speechSynthesis.speak(utt);
+  }
+  speakNext();
+}
+
+// 핸즈프리 사이클 상태 UI 업데이트
+function updateVoiceCycleStatus(phase) {
+  if (!state.voiceMode) return;
+  const vs = document.getElementById('voice-status');
+  if (!vs) return;
+  const labels = {
+    speaking: '🔊 AI 답변 중... (말씀하시면 중단)',
+    listening: '🔴 내 차례 — 독일어 또는 한국어로 말하세요',
+    waiting:   '⏳ AI 답변 기다리는 중...',
+    idle:      '🎙 핸즈프리 모드 켜짐',
+  };
+  vs.textContent = labels[phase] || '';
+  vs.classList.toggle('on', phase === 'listening');
+}
+
+// 텍스트를 한국어/독일어 블록으로 분리
+function splitByLanguage(text) {
+  const segments = [];
+  // 괄호 안 한국어 힌트, 순수 한국어 문장, 독일어 문장 모두 처리
+  // 패턴: 한글 포함 여부로 판단
+  const parts = text.split(/([가-힣ㄱ-ㅎㅏ-ㅣ\s,\.!?·:—\-()]+)/g);
+  parts.forEach(part => {
+    if (!part.trim()) return;
+    const hasKorean = /[가-힣ㄱ-ㅎㅏ-ㅣ]/.test(part);
+    // 괄호 안 내용은 한국어 힌트이므로 괄호 제거 후 읽기
+    const cleaned = part.replace(/[()（）]/g, '').trim();
+    if (cleaned) segments.push({ text: cleaned, isKorean: hasKorean });
+  });
+  return segments;
+}
+
+// 사용자 입력 언어 감지 (마이크 언어 설정용)
+function detectInputLang(text) {
+  if (!text) return 'de-DE';
+  const koreanChars = (text.match(/[가-힣]/g) || []).length;
+  const totalChars = text.replace(/\s/g,'').length;
+  return (koreanChars / totalChars > 0.3) ? 'ko-KR' : 'de-DE';
+}
+
+// ══════════════════════════════════════════
+// PRINT SCREEN
+// ══════════════════════════════════════════
+function buildPrintScreen() {
+  const container = document.getElementById('print-content');
+  container.innerHTML = SCENARIOS.map(sc => {
+    const phrases = sc.phrases['A2'].concat(
+      sc.phrases['A1'].filter(p => !sc.phrases['A2'].find(q => q.de === p.de)),
+      sc.phrases['B1'].filter(p => !sc.phrases['A2'].find(q => q.de === p.de))
+    );
+    return `<div class="print-section" id="ps-${sc.id}">
+      <div class="print-section-header" onclick="togglePrintSection('${sc.id}')">
+        <span style="font-size:18px">${sc.icon}</span>
+        <h3>${sc.title}</h3>
+        <span style="color:var(--text3);font-size:18px" id="ps-arrow-${sc.id}">▸</span>
+      </div>
+      <div class="print-section-body">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:10px">A1~B1 전체 표현 수록</div>
+        ${phrases.map(p => `
+          <div class="print-word-row">
+            <div>
+              <div class="pw-de">${p.de}</div>
+              <div class="pw-grammar">${p.gram}</div>
+            </div>
+            <div class="pw-ko">${p.ko}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function togglePrintSection(id) {
+  const sec = document.getElementById('ps-'+id);
+  const arrow = document.getElementById('ps-arrow-'+id);
+  sec.classList.toggle('open');
+  arrow.textContent = sec.classList.contains('open') ? '▾' : '▸';
+}
+
+// ══════════════════════════════════════════
+// AI PHRASE GENERATION
+// ══════════════════════════════════════════
+async function generateMorePhrases() {
+  const sc = state.currentScenario;
+  if (!sc || state.isGenerating) return;
+  state.isGenerating = true;
+
+  const btn = document.getElementById('btn-generate');
+  const icon = document.getElementById('generate-icon');
+  const label = document.getElementById('generate-label');
+  if (!btn || !icon || !label) { state.isGenerating = false; return; }
+  btn.disabled = true;
+  btn.classList.add('loading');
+  icon.textContent = '⏳';
+  label.textContent = 'AI가 표현을 생성하고 있어요...';
+
+  // 이미 있는 표현 목록 (중복 방지용) — 올바른 경로로 수정
+  const existing = (sc.phrases[state.level] || sc.phrases['A2']).map(p => p.de);
+  const aiExisting = ((state.aiPhrases[sc.id] || {})[state.level] || []).map(p => p.de);
+  const allExisting = [...existing, ...aiExisting].join(', ');
+
+  const prompt = 'Generate 6 workplace German phrases for: ' + sc.title + ' (' + sc.sub + '). Level: ' + state.level + '. Do NOT repeat: ' + allExisting + '. Respond ONLY with a JSON array, no markdown. Each item: {"de":"German phrase","ko":"Korean translation","ex":"상황설명(15자이내)","gram":"핵심문법(한국어,간결하게)"}. Return exactly 6 items.';
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': getApiKey(),
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1000,
+        messages: [{role: 'user', content: prompt}],
+      })
+    });
+
+    // 상태 코드 체크
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      throw new Error(res.status + ' ' + (errData.error?.message || res.statusText));
+    }
+
+    const data = await res.json();
+    let raw = (data.content?.[0]?.text || '[]').replace(/```json|```/g, '').trim();
+
+    // JSON 파싱 안전하게
+    let newPhrases = [];
+    try { newPhrases = JSON.parse(raw); } catch(pe) {
+      // 배열만 추출 시도
+      const match = raw.match(/\[[\s\S]*\]/);
+      if (match) newPhrases = JSON.parse(match[0]);
+      else throw new Error('JSON 파싱 실패: ' + pe.message);
+    }
+
+    if (!Array.isArray(newPhrases) || newPhrases.length === 0) {
+      throw new Error('생성된 표현이 없습니다.');
+    }
+
+    // 저장
+    if (!state.aiPhrases[sc.id]) state.aiPhrases[sc.id] = {};
+    if (!state.aiPhrases[sc.id][state.level]) state.aiPhrases[sc.id][state.level] = [];
+    state.aiPhrases[sc.id][state.level].push(...newPhrases);
+    saveAIPhrases();
+    renderAIPhrases();
+
+    icon.textContent = '✅';
+    label.textContent = newPhrases.length + '개 표현 추가됨! 더 생성하기';
+    setTimeout(() => {
+      icon.textContent = '✨';
+      label.textContent = 'AI로 표현 더 생성하기';
+    }, 2500);
+
+  } catch(e) {
+    console.error('Generate error:', e);
+    icon.textContent = '⚠️';
+    label.textContent = '오류: ' + (e.message || String(e));
+    setTimeout(() => {
+      icon.textContent = '✨';
+      label.textContent = 'AI로 표현 더 생성하기';
+    }, 3500);
+  }
+
+  if (btn) { btn.disabled = false; btn.classList.remove('loading'); }
+  state.isGenerating = false;
+}
+
+function renderAIPhrases() {
+  const sc = state.currentScenario;
+  if (!sc) return;
+  const phrases = (state.aiPhrases[sc.id] || {})[state.level] || [];
+  const section = document.getElementById('ai-phrases-section');
+  const list = document.getElementById('ai-phrases-list');
+
+  // 레슨 화면이 아닐 때는 요소가 없으므로 안전하게 종료
+  if (!section || !list) return;
+
+  if (phrases.length === 0) { section.style.display = 'none'; return; }
+  section.style.display = 'block';
+
+  list.innerHTML = phrases.map((p, i) => `
+    <div class="ai-phrase-card" id="apc${i}" onclick="toggleAIPhrase(${i})">
+      <div class="ai-badge">AI 생성</div>
+      <div class="ph-row">
+        <div class="ph-play" onclick="event.stopPropagation();speakAI(this)" data-text="${p.de}">🔊</div>
+        <div style="flex:1">
+          <div class="ph-de">${p.de}</div>
+          <div class="ph-ko">${p.ko}</div>
+        </div>
+      </div>
+      <div class="ph-details">
+        <div class="ph-example">예: ${p.ex}</div>
+        <div class="grammar-box">
+          <div class="grammar-tag">📝 문법 포인트</div>
+          <div class="grammar-text">${p.gram}</div>
+        </div>
+        <button onclick="event.stopPropagation();removeAIPhrase(${i})" style="margin-top:10px;background:none;border:0.5px solid var(--border);border-radius:8px;padding:4px 10px;font-size:11px;color:var(--text3);cursor:pointer;font-family:var(--sans);">삭제</button>
+      </div>
+    </div>
+  `).join('');
+
+  // scroll to show new phrases
+  list.scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+function toggleAIPhrase(i) {
+  const card = document.getElementById('apc'+i);
+  if (card) card.classList.toggle('expanded');
+}
+
+function removeAIPhrase(i) {
+  const sc = state.currentScenario;
+  if (!sc) return;
+  if (!state.aiPhrases[sc.id]) return;
+  if (!state.aiPhrases[sc.id][state.level]) return;
+  state.aiPhrases[sc.id][state.level].splice(i, 1);
+  saveAIPhrases();
+  renderAIPhrases();
+}
+
+function clearAIPhrases() {
+  const sc = state.currentScenario;
+  if (!sc) return;
+  if (state.aiPhrases[sc.id]) state.aiPhrases[sc.id][state.level] = [];
+  saveAIPhrases();
+  renderAIPhrases();
+}
+
+function saveAIPhrases() {
+  try { localStorage.setItem('buero_ai_phrases', JSON.stringify(state.aiPhrases)); } catch(e) {}
+}
+
+function loadAIPhrases() {
+  try {
+    const d = localStorage.getItem('buero_ai_phrases');
+    if (d) state.aiPhrases = JSON.parse(d);
+  } catch(e) {}
+}
+
+// ══════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════
+loadStorage();
+loadAIPhrases();
+renderStats();
+renderScenarios();
+showScreen('home');
+checkApiKey(); // API 키 없으면 overlay 표시, 있으면 탭바 보임
+</script>
+</body>
+</html>
