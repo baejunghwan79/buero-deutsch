@@ -430,6 +430,38 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   border-color: var(--border2);
 }
 
+
+/* ── LANG SWITCH ── */
+.lang-switch-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.lang-btn {
+  flex: 1;
+  padding: 10px 6px;
+  border-radius: var(--radius-sm);
+  background: var(--bg3);
+  border: 1.5px solid var(--border);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text3);
+  cursor: pointer;
+  font-family: var(--sans);
+  transition: all 0.15s;
+  letter-spacing: 0.02em;
+}
+.lang-btn.active {
+  border-color: var(--accent2);
+  color: var(--accent2);
+  background: rgba(124,111,224,0.12);
+}
+.lang-btn.active.ko {
+  border-color: #e8c547;
+  color: #e8c547;
+  background: rgba(232,197,71,0.1);
+}
+
 </style>
 </head>
 <body>
@@ -587,6 +619,14 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
       <button class="speed-btn on" id="speed-normal" onclick="setTTSRate(1.0)">▶ 보통</button>
       <button class="speed-btn" id="speed-fast" onclick="setTTSRate(1.2)">🐇 빠르게</button>
     </div>
+    <div class="lang-switch-row" id="lang-switch-row" style="display:none;">
+      <button class="lang-btn active" id="lang-de" onclick="switchMicLang('de-DE')">
+        🇩🇪 독일어
+      </button>
+      <button class="lang-btn" id="lang-ko" onclick="switchMicLang('ko-KR')">
+        🇰🇷 한국어
+      </button>
+    </div>
     <div class="voice-status" id="voice-status"></div>
     <div class="chat-row">
       <input class="chat-input" id="chat-input" placeholder="독일어로 입력하세요..." onkeydown="if(event.key==='Enter')sendMsg()">
@@ -688,6 +728,36 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
         저장 및 테스트
       </button>
       <div id="google-tts-status" style="font-size:11px;color:var(--text3);margin-top:6px;text-align:center;"></div>
+    </div>
+
+    <div class="grammar-section">
+      <h3>🎤 Google STT 키 <span style="font-size:10px;font-weight:400;color:var(--green);">정확한 음성 인식</span></h3>
+      <p style="font-size:12px;color:var(--text2);margin:6px 0 8px;">TTS와 동일한 Google API 키 사용 가능. Speech-to-Text API 활성화 필요.</p>
+      <div style="position:relative;">
+        <input id="google-stt-input" type="password"
+          style="width:100%;background:var(--bg3);border:1.5px solid var(--border2);border-radius:var(--radius-sm);
+                 padding:11px 44px 11px 14px;font-size:13px;color:var(--text);font-family:var(--sans);outline:none;"
+          placeholder="AIza... (TTS와 동일한 키)"
+        >
+        <button onclick="toggleGoogleSTTKeyVisibility()"
+          style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;color:var(--text3);"
+          id="google-stt-eye-btn">👁</button>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:8px;">
+        <button onclick="saveGoogleSTTKey()"
+          style="flex:1;padding:10px;border-radius:var(--radius-sm);
+                 background:linear-gradient(135deg,#34a853,#4285f4);
+                 border:none;color:#fff;font-family:var(--sans);font-size:13px;font-weight:600;cursor:pointer;">
+          저장
+        </button>
+        <button onclick="clearGoogleSTTKey()"
+          style="flex:1;padding:10px;border-radius:var(--radius-sm);
+                 background:var(--bg3);border:0.5px solid var(--border);
+                 color:var(--text2);font-family:var(--sans);font-size:13px;font-weight:600;cursor:pointer;">
+          삭제 (브라우저로)
+        </button>
+      </div>
+      <div id="google-stt-status" style="font-size:11px;color:var(--text3);margin-top:6px;text-align:center;"></div>
     </div>
 
     <div class="grammar-section">
@@ -986,6 +1056,8 @@ function showSettings() {
   if (gKey) document.getElementById('google-tts-input').value = gKey;
   const gVoice = localStorage.getItem('buero_google_voice') || 'de-DE-Neural2-B';
   document.getElementById('google-tts-voice').value = gVoice;
+  const sttKey = getGoogleSTTKey();
+  if (sttKey) document.getElementById('google-stt-input').value = sttKey;
   document.getElementById('settings-modal').classList.add('show');
 }
 
@@ -1005,6 +1077,9 @@ let state = {
   chatMode: 'text',
   voiceMode: false,
   ttsRate: 1.0, // 0.8=느리게, 1.0=보통, 1.2=빠르게
+  micLang: 'de-DE', // 마이크 언어 — 버튼으로 전환
+  mediaRecorder: null,
+  mediaStream: null,
   aiPhrases: {},
   isGenerating: false,
   hintsOn: false,
@@ -1422,6 +1497,28 @@ function setTTSRate(rate) {
   try { localStorage.setItem('buero_tts_rate', rate); } catch(e) {}
 }
 
+function switchMicLang(lang) {
+  state.micLang = lang;
+  const deDe = document.getElementById('lang-de');
+  const koKr = document.getElementById('lang-ko');
+  if (!deDe || !koKr) return;
+
+  if (lang === 'ko-KR') {
+    deDe.classList.remove('active');
+    koKr.classList.add('active', 'ko');
+  } else {
+    koKr.classList.remove('active', 'ko');
+    deDe.classList.add('active');
+    deDe.classList.remove('ko');
+  }
+
+  // 듣는 중이면 재시작해서 언어 즉시 전환
+  if (state.isListening) {
+    stopListening();
+    setTimeout(startListening, 200);
+  }
+}
+
 function setMode(mode) {
   state.chatMode = mode; // 'text' | 'voice' | 'analyze'
   state.voiceMode = mode === 'voice';
@@ -1433,6 +1530,9 @@ function setMode(mode) {
   if (mode === 'voice') {
     vs.textContent = '🎙 핸즈프리 모드 켜짐';
     inp.placeholder = '독일어 또는 한국어로 말하세요...';
+    // 언어 전환 버튼 표시
+    const lsr = document.getElementById('lang-switch-row');
+    if (lsr) lsr.style.display = 'flex';
     // 음성 모드 진입 즉시 마이크 시작
     setTimeout(() => {
       if (state.voiceMode && !state.isListening && !state.isSpeaking) startListening();
@@ -1446,7 +1546,9 @@ function setMode(mode) {
     vs.textContent = '';
     vs.classList.remove('on');
     inp.placeholder = '독일어로 입력하세요...';
-    stopListening(); // 음성 모드 해제 시 마이크 정지
+    stopListening();
+    const lsr = document.getElementById('lang-switch-row');
+    if (lsr) lsr.style.display = 'none';
   }
 }
 
@@ -1611,27 +1713,200 @@ function toggleMic() {
   else startListening();
 }
 
-function startListening() {
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) {
-    document.getElementById('voice-status').textContent = '이 브라우저는 음성 인식을 지원하지 않습니다 (Chrome 권장)';
+// ══════════════════════════════════════════
+// GOOGLE STT
+// ══════════════════════════════════════════
+function getGoogleSTTKey() {
+  return localStorage.getItem('buero_google_stt_key') || '';
+}
+
+function toggleGoogleSTTKeyVisibility() {
+  const inp = document.getElementById('google-stt-input');
+  const btn = document.getElementById('google-stt-eye-btn');
+  if (!inp) return;
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+  btn.textContent = inp.type === 'password' ? '👁' : '🙈';
+}
+
+function saveGoogleSTTKey() {
+  const val = document.getElementById('google-stt-input').value.trim();
+  const status = document.getElementById('google-stt-status');
+  if (!val.startsWith('AIza')) {
+    status.textContent = '❌ 올바른 Google API 키가 아닙니다';
+    status.style.color = 'var(--red)';
     return;
   }
-  if (state.isSpeaking) { window.speechSynthesis.cancel(); state.isSpeaking = false; }
+  localStorage.setItem('buero_google_stt_key', val);
+  status.textContent = '✅ 저장 완료! 다음 녹음부터 Google STT 사용';
+  status.style.color = 'var(--green)';
+}
 
-  // 현재 입력창 내용으로 언어 감지 (비어있으면 독일어 기본)
-  const inputEl = document.getElementById('chat-input');
-  const currentInput = inputEl ? inputEl.value : '';
-  const recLang = detectInputLang(currentInput) ;
+function clearGoogleSTTKey() {
+  localStorage.removeItem('buero_google_stt_key');
+  const inp = document.getElementById('google-stt-input');
+  if (inp) inp.value = '';
+  const status = document.getElementById('google-stt-status');
+  if (status) { status.textContent = '브라우저 음성 인식으로 전환됩니다'; status.style.color = 'var(--text3)'; }
+}
 
+// MediaRecorder로 오디오 녹음 후 Google STT API 호출
+async function googleSTT(audioBlob, lang) {
+  const key = getGoogleSTTKey();
+  if (!key) throw new Error('No STT key');
+
+  // Blob → Base64
+  const base64 = await new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result.split(',')[1]);
+    reader.onerror = reject;
+    reader.readAsDataURL(audioBlob);
+  });
+
+  // 언어 코드 — 한국어/독일어 모두 후보로 지정
+  const langCodes = lang === 'ko-KR'
+    ? ['ko-KR', 'de-DE']
+    : ['de-DE', 'ko-KR'];
+
+  const res = await fetch(
+    'https://speech.googleapis.com/v1/speech:recognize?key=' + key,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        config: {
+          encoding: 'WEBM_OPUS',
+          sampleRateHertz: 48000,
+          languageCode: langCodes[0],
+          alternativeLanguageCodes: langCodes.slice(1),
+          enableAutomaticPunctuation: true,
+          model: 'latest_long',
+        },
+        audio: { content: base64 }
+      })
+    }
+  );
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error?.message || res.status);
+  }
+
+  const data = await res.json();
+  const result = data.results?.[0];
+  if (!result) return { text: '', lang: langCodes[0] };
+
+  const transcript = result.alternatives?.[0]?.transcript || '';
+  // 인식된 언어 감지
+  const detectedLang = result.languageCode || langCodes[0];
+  return { text: transcript, lang: detectedLang };
+}
+
+// ── Google STT 기반 startListening
+function startListening() {
+  if (state.isSpeaking) { window.speechSynthesis && window.speechSynthesis.cancel(); state.isSpeaking = false; }
+
+  const sttKey = getGoogleSTTKey();
+  if (sttKey) {
+    startGoogleListening(sttKey);
+  } else {
+    startBrowserListening();
+  }
+}
+
+// Google STT — MediaRecorder 기반 녹음
+function startGoogleListening(sttKey) {
+  const recLang = state.micLang || 'de-DE';
+
+  navigator.mediaDevices.getUserMedia({ audio: true })
+    .then(stream => {
+      state.isListening = true;
+      state.mediaStream = stream;
+
+      const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
+        ? 'audio/webm;codecs=opus' : 'audio/webm';
+      const recorder = new MediaRecorder(stream, { mimeType });
+      state.mediaRecorder = recorder;
+      const chunks = [];
+
+      recorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
+
+      recorder.onstop = async () => {
+        const blob = new Blob(chunks, { type: mimeType });
+        setVoiceStatus('waiting', '⏳ 인식 중...');
+
+        try {
+          const result = await googleSTT(blob, recLang);
+          if (!result.text.trim()) {
+            // 아무 말 없었으면 다시 듣기
+            if (state.isListening && !state.isWaitingAI) {
+              setTimeout(() => startGoogleListening(sttKey), 300);
+            }
+            return;
+          }
+
+          // 인식된 언어가 한국어면 한국어 버튼 자동 활성화
+          if (result.lang && result.lang.startsWith('ko') && state.micLang !== 'ko-KR') {
+            switchMicLang('ko-KR');
+          } else if (result.lang && result.lang.startsWith('de') && state.micLang !== 'de-DE') {
+            switchMicLang('de-DE');
+          }
+
+          const input = document.getElementById('chat-input');
+          if (input) input.value = result.text;
+
+          if (!state.isWaitingAI) {
+            stopListening();
+            sendMsg();
+          }
+        } catch(e) {
+          console.error('Google STT error:', e);
+          setVoiceStatus('idle', '❌ STT 오류: ' + e.message);
+          if (state.isListening && !state.isWaitingAI) {
+            setTimeout(() => startGoogleListening(sttKey), 1000);
+          }
+        }
+      };
+
+      // UI 업데이트
+      const btn = document.getElementById('btn-mic');
+      if (btn) btn.classList.add('on');
+      const langLabel = recLang === 'ko-KR' ? '🇰🇷 한국어로 말하세요' : '🇩🇪 독일어로 말하세요';
+      setVoiceStatus('listening', '🔴 듣고 있어요... ' + langLabel);
+
+      // 녹음 시작 — 최대 8초, 말 끝나면 silenceTimer로 중지
+      recorder.start();
+
+      // 침묵 감지: VAD 대신 최대 8초 후 자동 종료
+      // 사용자가 말을 멈추면 수동으로도 전송 가능
+      state.silenceTimer = setTimeout(() => {
+        if (recorder.state === 'recording') recorder.stop();
+      }, 8000);
+
+    })
+    .catch(err => {
+      setVoiceStatus('idle', err.name === 'NotAllowedError'
+        ? '❌ 마이크 권한을 허용해주세요'
+        : '❌ 마이크 오류: ' + err.message);
+      state.isListening = false;
+    });
+}
+
+// 브라우저 내장 STT fallback
+function startBrowserListening() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) {
+    setVoiceStatus('idle', '이 브라우저는 음성 인식을 지원하지 않습니다 (Chrome 권장)');
+    return;
+  }
+
+  const recLang = state.micLang || 'de-DE';
   const rec = new SR();
-  rec.lang = recLang;          // 한국어/독일어 자동 선택
-  rec.continuous = false;      // ← 한 발화씩 처리 (중복 방지)
-  rec.interimResults = true;   // 중간 결과로 실시간 표시
+  rec.lang = recLang;
+  rec.continuous = false;
+  rec.interimResults = true;
   rec.maxAlternatives = 1;
   state.recognition = rec;
 
-  // resultIndex 기준으로만 새 결과 처리 (누적 방지 핵심)
   let accumulatedFinal = '';
 
   rec.onstart = () => {
@@ -1639,99 +1914,84 @@ function startListening() {
     accumulatedFinal = '';
     document.getElementById('chat-input').value = '';
     document.getElementById('btn-mic').classList.add('on');
-    const langLabel = rec.lang === 'ko-KR' ? '한국어로 말하세요' : '독일어로 말하세요';
-    document.getElementById('voice-status').textContent = '🔴 듣고 있어요... ' + langLabel;
-    document.getElementById('voice-status').classList.add('on');
+    const langLabel = state.micLang === 'ko-KR' ? '🇰🇷 한국어로 말하세요' : '🇩🇪 독일어로 말하세요';
+    setVoiceStatus('listening', '🔴 듣고 있어요... ' + langLabel);
   };
 
   rec.onresult = (e) => {
     clearTimeout(state.silenceTimer);
-
-    // e.resultIndex부터만 처리 — 이전 결과 재처리 방지
-    let newFinal = '';
-    let interim = '';
+    let newFinal = '', interim = '';
     for (let i = e.resultIndex; i < e.results.length; i++) {
-      if (e.results[i].isFinal) {
-        newFinal += e.results[i][0].transcript;
-      } else {
-        interim += e.results[i][0].transcript;
-      }
+      if (e.results[i].isFinal) newFinal += e.results[i][0].transcript;
+      else interim += e.results[i][0].transcript;
     }
-
     if (newFinal) accumulatedFinal += newFinal;
-
-    const displayText = accumulatedFinal + interim;
     const input = document.getElementById('chat-input');
-    if (input) input.value = displayText;
+    if (input) input.value = accumulatedFinal + interim;
+    setVoiceStatus('listening', interim ? '🗣 말씀 중...' : '⏸ 잠깐 멈춤');
 
-    const vs = document.getElementById('voice-status');
-    if (vs) {
-      if (state.voiceMode) {
-        vs.textContent = interim ? '🗣 말씀 중...' : '⏸ 잠깐 멈춤 — 계속 말하거나 기다리세요';
-      } else {
-        vs.textContent = interim ? '🗣 말씀 중...' : '⏸ 잠깐 멈춤 — 계속 말하거나 전송 버튼 탭';
-      }
-    }
-
-    // 발화 완료(isFinal) 후 1.8초 침묵 → 자동 전송
     if (accumulatedFinal.trim()) {
       state.silenceTimer = setTimeout(() => {
         if (accumulatedFinal.trim() && !state.isWaitingAI) {
-          stopListening();
-          sendMsg();
+          stopListening(); sendMsg();
         }
       }, 1800);
     }
   };
 
   rec.onerror = (e) => {
-    // 'no-speech'는 조용한 상황 — 에러 아님, 재시작
     if (e.error === 'no-speech') {
-      if (state.isListening && !state.isWaitingAI) {
-        try { rec.start(); } catch(err) {}
-      }
+      if (state.isListening && !state.isWaitingAI) { try { rec.start(); } catch(err) {} }
       return;
     }
-    const vs = document.getElementById('voice-status');
-    if (vs) {
-      vs.textContent = e.error === 'not-allowed'
-        ? '❌ 마이크 권한을 허용해주세요'
-        : '음성 오류: ' + e.error;
-      vs.classList.remove('on');
-    }
+    setVoiceStatus('idle', e.error === 'not-allowed' ? '❌ 마이크 권한을 허용해주세요' : '음성 오류: ' + e.error);
     stopListening();
   };
 
-  // continuous:false 이므로 한 발화 끝나면 onend 호출됨
-  // 아직 말하는 중이면(interim 있거나 짧은 pause) 재시작
   rec.onend = () => {
     if (!state.isListening || state.isWaitingAI) return;
-    // silenceTimer가 이미 전송 예약됐으면 재시작 안 함
     if (state.silenceTimer && accumulatedFinal.trim()) return;
-    // 계속 듣기 — 새 인스턴스로 재시작
     try { rec.start(); } catch(err) {}
   };
 
   rec.start();
 }
 
+function setVoiceStatus(phase, text) {
+  const vs = document.getElementById('voice-status');
+  if (!vs) return;
+  vs.textContent = text || '';
+  vs.classList.toggle('on', phase === 'listening');
+}
+
+
+
 function stopListening() {
   state.isListening = false;
   clearTimeout(state.silenceTimer);
+  state.silenceTimer = null;
+
+  // 브라우저 STT 정리
   if (state.recognition) {
     try { state.recognition.stop(); } catch(e) {}
     state.recognition = null;
   }
+  // Google STT (MediaRecorder) 정리
+  if (state.mediaRecorder && state.mediaRecorder.state === 'recording') {
+    try { state.mediaRecorder.stop(); } catch(e) {}
+  }
+  state.mediaRecorder = null;
+  if (state.mediaStream) {
+    state.mediaStream.getTracks().forEach(t => t.stop());
+    state.mediaStream = null;
+  }
+
   const btn = document.getElementById('btn-mic');
   if (btn) btn.classList.remove('on');
   const vs = document.getElementById('voice-status');
   if (vs) {
     vs.classList.remove('on');
-    if (state.voiceMode) {
-      vs.textContent = '🎙 핸즈프리 모드 켜짐';
-    } else {
-      vs.textContent = '';
-    }
+    vs.textContent = state.voiceMode ? '🎙 핸즈프리 모드 켜짐' : '';
   }
 }
 
