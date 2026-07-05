@@ -462,6 +462,109 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   background: rgba(232,197,71,0.1);
 }
 
+
+/* ── AVATAR ── */
+.avatar-zone {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px 0 8px;
+  background: linear-gradient(to bottom, var(--bg2), transparent);
+}
+.avatar-wrap {
+  position: relative;
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2.5px solid var(--border2);
+  box-shadow: 0 4px 20px rgba(124,111,224,0.25);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.avatar-wrap.speaking {
+  border-color: var(--accent2);
+  box-shadow: 0 0 0 4px rgba(124,111,224,0.2), 0 4px 20px rgba(124,111,224,0.4);
+  animation: avatarPulse 1.8s ease-in-out infinite;
+}
+.avatar-wrap.listening {
+  border-color: var(--red);
+  box-shadow: 0 0 0 4px rgba(248,113,113,0.2), 0 4px 20px rgba(248,113,113,0.3);
+}
+@keyframes avatarPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+}
+.avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+}
+
+/* 입 애니메이션 오버레이 */
+.avatar-mouth {
+  position: absolute;
+  bottom: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: none;
+  align-items: flex-end;
+  gap: 2px;
+  height: 16px;
+}
+.avatar-wrap.speaking .avatar-mouth { display: flex; }
+.mouth-bar {
+  width: 4px;
+  background: rgba(255,255,255,0.85);
+  border-radius: 2px;
+  animation: mouthWave 0.5s ease-in-out infinite alternate;
+}
+.mouth-bar:nth-child(1) { animation-delay: 0s; }
+.mouth-bar:nth-child(2) { animation-delay: 0.15s; }
+.mouth-bar:nth-child(3) { animation-delay: 0.3s; }
+@keyframes mouthWave {
+  from { height: 3px; }
+  to   { height: 14px; }
+}
+
+/* 듣는 중 링 */
+.avatar-listen-ring {
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 2px solid var(--red);
+  opacity: 0;
+  transition: opacity 0.3s;
+  animation: listenRing 1s ease-in-out infinite;
+}
+.avatar-wrap.listening .avatar-listen-ring { opacity: 1; }
+@keyframes listenRing {
+  0%, 100% { transform: scale(1); opacity: 0.6; }
+  50% { transform: scale(1.08); opacity: 1; }
+}
+
+/* 이름 태그 */
+.avatar-name-tag {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 7px;
+}
+.avatar-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+.avatar-status {
+  font-size: 11px;
+  color: var(--text3);
+  transition: color 0.3s;
+}
+.avatar-status.speaking { color: var(--accent2); }
+.avatar-status.listening { color: var(--red); }
+.avatar-status.thinking { color: var(--gold); }
+
 </style>
 </head>
 <body>
@@ -601,6 +704,25 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
       <span class="nav-sub" id="chat-nav-sub">독일어로 자유롭게 말해보세요</span>
     </span>
   </div>
+  <!-- 아바타 영역 -->
+  <div class="avatar-zone" id="avatar-zone">
+    <div class="avatar-wrap" id="avatar-wrap">
+      <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3Fl3PRICtqaZsTBLdrugjHDowf6/hf_20260630_145427_c821b5f2-2f54-4486-a010-7ded43437bc6.png" class="avatar-img" id="avatar-img" alt="AI 동료">
+      <!-- 말하는 중 입 애니메이션 오버레이 -->
+      <div class="avatar-mouth" id="avatar-mouth">
+        <div class="mouth-bar"></div>
+        <div class="mouth-bar"></div>
+        <div class="mouth-bar"></div>
+      </div>
+      <!-- 듣는 중 귀 표시 -->
+      <div class="avatar-listen-ring" id="avatar-listen-ring"></div>
+    </div>
+    <div class="avatar-name-tag" id="avatar-name-tag">
+      <span class="avatar-name">Lukas</span>
+      <span class="avatar-status" id="avatar-status">● 대기 중</span>
+    </div>
+  </div>
+
   <div class="chat-messages" id="chat-messages">
     <div class="typing-dots" id="typing-dots">
       <div class="dot"></div><div class="dot"></div><div class="dot"></div>
@@ -1481,6 +1603,7 @@ async function sendMsg() {
   } else {
     addMsg('user', text);
     if (state.voiceMode) updateVoiceCycleStatus('waiting');
+    setAvatarState('thinking');
     await getAIResponse(text, false);
   }
 }
@@ -1916,6 +2039,7 @@ function startBrowserListening() {
     document.getElementById('btn-mic').classList.add('on');
     const langLabel = state.micLang === 'ko-KR' ? '🇰🇷 한국어로 말하세요' : '🇩🇪 독일어로 말하세요';
     setVoiceStatus('listening', '🔴 듣고 있어요... ' + langLabel);
+    setAvatarState('listening');
   };
 
   rec.onresult = (e) => {
@@ -1993,6 +2117,7 @@ function stopListening() {
     vs.classList.remove('on');
     vs.textContent = state.voiceMode ? '🎙 핸즈프리 모드 켜짐' : '';
   }
+  setAvatarState('idle');
 }
 
 function speakAI(el) {
@@ -2010,6 +2135,31 @@ function speak(text) {
   } else {
     speakBrowser({ text: text, isKorean: false }, function() {});
   }
+}
+
+
+// ══════════════════════════════════════════
+// AVATAR ANIMATION
+// ══════════════════════════════════════════
+function setAvatarState(state) {
+  const wrap = document.getElementById('avatar-wrap');
+  const status = document.getElementById('avatar-status');
+  if (!wrap || !status) return;
+
+  wrap.classList.remove('speaking', 'listening');
+  status.classList.remove('speaking', 'listening', 'thinking');
+
+  const states = {
+    speaking:  { cls: 'speaking',  label: '● 말하는 중',  statusCls: 'speaking' },
+    listening: { cls: 'listening', label: '● 듣는 중',    statusCls: 'listening' },
+    thinking:  { cls: '',          label: '● 생각 중...',  statusCls: 'thinking' },
+    idle:      { cls: '',          label: '● 대기 중',    statusCls: '' },
+  };
+
+  const s = states[state] || states.idle;
+  if (s.cls) wrap.classList.add(s.cls);
+  status.textContent = s.label;
+  if (s.statusCls) status.classList.add(s.statusCls);
 }
 
 // ══════════════════════════════════════════
@@ -2141,9 +2291,11 @@ function speakText(text, onDone) {
   if (segments.length === 0) {
     state.isSpeaking = false;
     updateVoiceCycleStatus('idle');
+    setAvatarState('idle');
     if (onDone) onDone();
     return;
   }
+  setAvatarState('speaking');
 
   const gKey = getGoogleTTSKey();
 
@@ -2152,6 +2304,7 @@ function speakText(text, onDone) {
     if (idx >= segments.length) {
       state.isSpeaking = false;
       updateVoiceCycleStatus('idle');
+      setAvatarState('idle');
       if (onDone) onDone();
       return;
     }
